@@ -4,7 +4,7 @@ import { toast } from 'react-toastify'
 import * as XLSX from 'xlsx'
 import ApperIcon from './ApperIcon'
 
-const DataExport = ({ isOpen, onClose, crops = [], tasks = [], expenses = [] }) => {
+const DataExport = ({ isOpen, onClose, farms, crops, tasks, expenses }) => {
   const [exportConfig, setExportConfig] = useState({
     dataTypes: {
       crops: true,
@@ -16,6 +16,7 @@ const DataExport = ({ isOpen, onClose, crops = [], tasks = [], expenses = [] }) 
       start: '',
       end: ''
     },
+        farms: farms || [],
     includeHeaders: true,
     separateSheets: true
   })
@@ -27,6 +28,9 @@ const DataExport = ({ isOpen, onClose, crops = [], tasks = [], expenses = [] }) 
       'Crop Name': crop.name,
       'Variety': crop.variety,
       'Planting Date': crop.plantingDate,
+        case 'farms':
+          exportData = { farms: data.farms }
+          break
       'Status': crop.status,
       'Area (acres)': crop.area,
       'Expected Harvest': crop.expectedHarvest || 'Not set',
@@ -104,6 +108,7 @@ const DataExport = ({ isOpen, onClose, crops = [], tasks = [], expenses = [] }) 
           header: exportConfig.includeHeaders ? Object.keys(data[0]) : undefined
         })
         
+                    <option value="farms">Farms Only</option>
         // Auto-adjust column widths
         const colWidths = Object.keys(data[0]).map(key => ({
           wch: Math.max(
@@ -130,6 +135,7 @@ const DataExport = ({ isOpen, onClose, crops = [], tasks = [], expenses = [] }) 
     setIsExporting(true)
     
     try {
+                  {(exportType === 'all' || exportType === 'farms') && <li>Farm information and details</li>}
       const selectedData = []
       
       if (exportConfig.dataTypes.crops) {
