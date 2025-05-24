@@ -575,7 +575,7 @@ const FarmMap = () => {
       {/* Crop Modal */}
       {showCropModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-xl w-full max-w-md max-h-[90vh] flex flex-col">
+          <div className="bg-white rounded-xl w-full max-w-md max-h-[90vh] flex flex-col overflow-hidden">
             {/* Modal Header */}
             <div className="flex-shrink-0 p-6 border-b border-gray-200">
               <div className="flex items-center justify-between">
@@ -596,85 +596,92 @@ const FarmMap = () => {
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Field</label>
                   <select
-                  value={cropForm.fieldId}
-                  onChange={(e) => setCropForm({...cropForm, fieldId: e.target.value})}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
-                >
-                  <option value="">Select a field</option>
-                  {fields.map(field => (
-                    <option key={field.id} value={field.id}>{field.name}</option>
-                  ))}
-                </select>
+                    value={cropForm.fieldId}
+                    onChange={(e) => setCropForm({...cropForm, fieldId: e.target.value})}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                  >
+                    <option value="">Select a field</option>
+                    {fields.map(field => (
+                      <option key={field.id} value={field.id}>{field.name}</option>
+                    ))}
+                  </select>
                 </div>
+                
                 {/* Assigned Farm */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Assigned Farm</label>
                   <select
-                  value={cropForm.assignedFarm}
-                  onChange={(e) => setCropForm({...cropForm, assignedFarm: e.target.value})}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
-                >
-                  <option value="">Select a farm</option>
-                  {farms.map(farm => (
-                    <option key={farm.id} value={farm.id}>{farm.name}</option>
-                  ))}
-                </select>
+                    value={cropForm.assignedFarm}
+                    onChange={(e) => setCropForm({...cropForm, assignedFarm: e.target.value})}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                  >
+                    <option value="">Select a farm</option>
+                    {farms.map(farm => (
+                      <option key={farm.id} value={farm.id}>{farm.name}</option>
+                    ))}
+                  </select>
                 </div>
+                
                 {/* Crop Type */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Crop Type</label>
                   <select
-                  value={cropForm.cropType}
-                  onChange={(e) => setCropForm({...cropForm, cropType: e.target.value})}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
-                >
-                  <option value="">Select crop type</option>
-                  {cropTypes.map(crop => (
-                    <option key={crop} value={crop} className="capitalize">{crop}</option>
-                  ))}
-                </select>
+                    value={cropForm.cropType}
+                    onChange={(e) => setCropForm({...cropForm, cropType: e.target.value})}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                  >
+                    <option value="">Select crop type</option>
+                    {cropTypes.map(crop => (
+                      <option key={crop} value={crop} className="capitalize">{crop}</option>
+                    ))}
+                  </select>
                 </div>
+                
                 {/* Variety */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Variety</label>
                   <input
-                  type="text"
-                  value={cropForm.variety}
-                  onChange={(e) => setCropForm({...cropForm, variety: e.target.value})}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
-                />
+                    type="text"
+                    value={cropForm.variety}
+                    onChange={(e) => setCropForm({...cropForm, variety: e.target.value})}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                    placeholder="e.g., Cherry, Beefsteak"
+                  />
                 </div>
+                
                 {/* Planting Date */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Planting Date</label>
                   <input
-                  type="date"
-                  value={cropForm.plantingDate}
-                  onChange={(e) => setCropForm({...cropForm, plantingDate: e.target.value})}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
-                />
+                    type="date"
+                    value={cropForm.plantingDate}
+                    onChange={(e) => setCropForm({...cropForm, plantingDate: e.target.value})}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                  />
                 </div>
+                
                 {/* Expected Harvest Date */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Expected Harvest Date</label>
                   <input
-                  type="date"
-                  value={cropForm.expectedHarvestDate}
-                  onChange={(e) => setCropForm({...cropForm, expectedHarvestDate: e.target.value})}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
-                />
+                    type="date"
+                    value={cropForm.expectedHarvestDate}
+                    onChange={(e) => setCropForm({...cropForm, expectedHarvestDate: e.target.value})}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                  />
                 </div>
+                
                 {/* Notes */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Notes</label>
                   <textarea
-                  value={cropForm.notes}
-                  onChange={(e) => setCropForm({...cropForm, notes: e.target.value})}
-                  rows="3"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
-                  placeholder="Additional notes about this crop..."
-                ></textarea>
-              </div>
+                    value={cropForm.notes}
+                    onChange={(e) => setCropForm({...cropForm, notes: e.target.value})}
+                    rows="3"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                    placeholder="Additional notes about this crop..."
+                  ></textarea>
+                </div>
               </div>
             </div>
             
