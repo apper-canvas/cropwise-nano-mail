@@ -857,7 +857,6 @@ const MainFeature = () => {
         tasks={tasks}
         expenses={expenses}
       />
-    </div>
   )
 }
 
