@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import MainFeature from '../components/MainFeature'
 import ApperIcon from '../components/ApperIcon'
+import WeatherWidget from '../components/WeatherWidget'
 
 const Home = () => {
   const [darkMode, setDarkMode] = useState(false)
