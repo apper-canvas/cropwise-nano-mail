@@ -136,6 +136,17 @@ const MainFeature = () => {
   return (
     <div className="bg-white/80 dark:bg-surface-800/80 backdrop-blur-sm rounded-2xl shadow-neu-light dark:shadow-neu-dark overflow-hidden">
       {/* Tab Navigation */}
+  const addWeatherTask = async () => {
+    const suggestions = await getWeatherAwareTasks()
+    if (suggestions.length > 0) {
+      const task = { ...suggestions[0], id: Date.now(), completed: false }
+      setTasks([...tasks, task])
+      toast.success('Weather-based task added!')
+    } else {
+      toast.info('No weather-based tasks needed at this time')
+    }
+  }
+
       <div className="border-b border-surface-200 dark:border-surface-700">
         <div className="flex overflow-x-auto scrollbar-hide">
           {tabs.map((tab) => (
@@ -337,13 +348,22 @@ const MainFeature = () => {
                           className="w-full px-3 py-2 border border-surface-300 dark:border-surface-600 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent dark:bg-surface-800 dark:text-surface-100"
                           placeholder="e.g., Water Tomatoes"
                         />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-2">
-                          Due Date
-                        </label>
-                        <input
-                          type="date"
+                <div className="flex flex-col sm:flex-row gap-2">
+                  <button
+                    onClick={addWeatherTask}
+                    className="flex items-center gap-2 bg-blue-500 hover:bg-blue-600 text-white px-3 py-2 rounded-lg transition-colors duration-300 text-sm"
+                  >
+                    <ApperIcon name="Cloud" className="h-4 w-4" />
+                    Weather Task
+                  </button>
+                  <button
+                    onClick={() => setShowTaskForm(!showTaskForm)}
+                    className="flex items-center gap-2 bg-primary hover:bg-primary-dark text-white px-4 py-2 rounded-xl transition-colors duration-300 w-fit"
+                  >
+                    <ApperIcon name="Plus" className="h-4 w-4" />
+                    Add Task
+                  </button>
+                </div>
                           value={newTask.dueDate}
                           onChange={(e) => setNewTask({...newTask, dueDate: e.target.value})}
                           className="w-full px-3 py-2 border border-surface-300 dark:border-surface-600 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent dark:bg-surface-800 dark:text-surface-100"

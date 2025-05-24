@@ -111,44 +111,9 @@ const Home = () => {
         <MainFeature />
       </section>
 
-      {/* Weather Widget */}
+      {/* Weather & Recommendations Widget */}
       <section className="container mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="bg-gradient-to-r from-blue-500 to-blue-600 rounded-2xl p-6 sm:p-8 text-white shadow-card"
-        >
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 sm:gap-6">
-            <div>
-              <h3 className="text-lg sm:text-xl font-bold mb-2">Today's Weather</h3>
-              <div className="flex items-center gap-3">
-                <ApperIcon name="Sun" className="h-8 w-8 sm:h-10 sm:w-10" />
-                <div>
-                  <div className="text-2xl sm:text-3xl font-bold">72°F</div>
-                  <div className="text-blue-100 text-sm">Partly Cloudy</div>
-                </div>
-              </div>
-            </div>
-            
-            <div className="grid grid-cols-3 gap-4 sm:gap-6 text-center">
-              <div>
-                <ApperIcon name="Droplets" className="h-5 w-5 mx-auto mb-1" />
-                <div className="text-xs sm:text-sm opacity-90">Humidity</div>
-                <div className="font-semibold">65%</div>
-              </div>
-              <div>
-                <ApperIcon name="Wind" className="h-5 w-5 mx-auto mb-1" />
-                <div className="text-xs sm:text-sm opacity-90">Wind</div>
-                <div className="font-semibold">8 mph</div>
-              </div>
-              <div>
-                <ApperIcon name="CloudRain" className="h-5 w-5 mx-auto mb-1" />
-                <div className="text-xs sm:text-sm opacity-90">Rain</div>
-                <div className="font-semibold">20%</div>
-              </div>
-            </div>
-          </div>
-        </motion.div>
+        <WeatherWidget />
       </section>
 
       {/* Footer */}

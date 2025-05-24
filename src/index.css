@@ -68,3 +68,31 @@
 .Toastify__toast--warning {
   @apply bg-accent text-white;
 }
+
+/* Weather widget specific styles */
+.weather-gradient-sunny {
+  background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+}
+
+.weather-gradient-cloudy {
+  background: linear-gradient(135deg, #9ca3af 0%, #6b7280 100%);
+}
+
+.weather-gradient-rainy {
+  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+}
+
+.weather-alert-high {
+  @apply bg-red-50 border-l-4 border-red-500 text-red-800;
+}
+
+.weather-alert-medium {
+  @apply bg-yellow-50 border-l-4 border-yellow-500 text-yellow-800;
+}
+
+/* Responsive weather grid */
+@media (max-width: 640px) {
+  .weather-stats-grid {
+    @apply grid-cols-2 gap-3;
+  }
+}
