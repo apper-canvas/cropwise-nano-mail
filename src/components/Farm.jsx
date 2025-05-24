@@ -43,6 +43,51 @@ const Farm = () => {
   const [filterType, setFilterType] = useState('all')
   const [sortBy, setSortBy] = useState('name')
 
+  const [showCropHistoryModal, setShowCropHistoryModal] = useState(false)
+  const [selectedFarmHistory, setSelectedFarmHistory] = useState(null)
+  
+  // Sample crop history data
+  const [cropHistory] = useState([
+    {
+      id: 1,
+      farmId: 1,
+      cropName: 'Tomatoes',
+      variety: 'Roma',
+      plantingDate: '2023-03-15',
+      harvestDate: '2023-07-20',
+      area: 10.5,
+      yieldAmount: 2400,
+      yieldUnit: 'lbs',
+      season: 'Spring 2023',
+      status: 'Harvested'
+    },
+    {
+      id: 2,
+      farmId: 1,
+      cropName: 'Corn',
+      variety: 'Sweet Corn',
+      plantingDate: '2023-05-01',
+      harvestDate: '2023-08-15',
+      area: 15.0,
+      yieldAmount: 1800,
+      yieldUnit: 'lbs',
+      season: 'Summer 2023',
+      status: 'Harvested'
+    },
+    {
+      id: 3,
+      farmId: 2,
+      cropName: 'Wheat',
+      variety: 'Hard Red Winter',
+      plantingDate: '2022-10-15',
+      harvestDate: '2023-06-30',
+      area: 40.0,
+      yieldAmount: 3200,
+      yieldUnit: 'bushels',
+      season: 'Fall 2022 - Summer 2023',
+      status: 'Harvested'
+    }
+  ])
   const [newFarm, setNewFarm] = useState({
     name: '',
     location: '',
@@ -132,8 +177,14 @@ const Farm = () => {
     .filter(farm => {
       const matchesSearch = farm.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                            farm.location.toLowerCase().includes(searchTerm.toLowerCase())
-      const matchesType = filterType === 'all' || farm.type === filterType
+    const farmCropHistory = cropHistory.filter(crop => crop.farmId === farmId)
+    setSelectedFarmHistory({ farmId, crops: farmCropHistory })
+    setShowCropHistoryModal(true)
       return matchesSearch && matchesType
+  
+  const getStatusColor = (status) => {
+    return status === 'Harvested' ? 'text-green-500 bg-green-50' : 'text-yellow-500 bg-yellow-50'
+  }
     })
     .sort((a, b) => {
       switch (sortBy) {
@@ -160,14 +211,14 @@ const Farm = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-green-50 to-teal-50 dark:from-surface-900 dark:via-surface-800 dark:to-surface-900">
       {/* Header */}
-      <header className="bg-white/80 dark:bg-surface-800/80 backdrop-blur-sm shadow-sm">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <Link
-                to="/"
-                className="flex items-center gap-2 text-surface-600 hover:text-primary transition-colors duration-300"
-              >
+  const getFarmStatusColor = (status) => {
+    switch (status) {
+      case 'Active': return 'text-green-500 bg-green-50'
+      case 'Inactive': return 'text-gray-500 bg-gray-50'
+      case 'Planning': return 'text-blue-500 bg-blue-50'
+      default: return 'text-gray-500 bg-gray-50'
+    }
+  }
                 <ApperIcon name="ArrowLeft" className="h-5 w-5" />
                 Back to Dashboard
               </Link>
@@ -428,7 +479,7 @@ const Farm = () => {
                       <ApperIcon name="Calendar" className="h-4 w-4" />
                       Est. {new Date(farm.established).getFullYear()}
                     </div>
-                    {farm.description && (
+                    <span className={`px-2 py-1 rounded-lg text-xs font-medium ${getFarmStatusColor(farm.status)}`}>
                       <p className="text-sm text-surface-600 dark:text-surface-400 line-clamp-2">
                         {farm.description}
                       </p>
@@ -488,3 +539,95 @@ const Farm = () => {
 }
 
 export default Farm
+      {/* Crop History Modal */}
+      <AnimatePresence>
+        {showCropHistoryModal && selectedFarmHistory && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50"
+            onClick={() => setShowCropHistoryModal(false)}
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              onClick={(e) => e.stopPropagation()}
+              className="bg-white dark:bg-surface-800 rounded-xl shadow-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto"
+            >
+              <div className="p-6">
+                <div className="flex items-center justify-between mb-6">
+                  <h3 className="text-xl font-semibold text-surface-900 dark:text-surface-100">
+                    Crop History - {farms.find(f => f.id === selectedFarmHistory.farmId)?.name}
+                  </h3>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => navigate(`/crop-history/${selectedFarmHistory.farmId}`)}
+                      className="flex items-center gap-2 bg-primary hover:bg-primary-dark text-white px-4 py-2 rounded-lg transition-colors duration-300"
+                    >
+                      <ApperIcon name="ExternalLink" className="h-4 w-4" />
+                      View Full History
+                    </button>
+                    <button
+                      onClick={() => setShowCropHistoryModal(false)}
+                      className="p-2 hover:bg-surface-100 dark:hover:bg-surface-700 rounded-lg transition-colors"
+                    >
+                      <ApperIcon name="X" className="h-5 w-5" />
+                    </button>
+                  </div>
+                </div>
+
+                {selectedFarmHistory.crops.length > 0 ? (
+                  <div className="space-y-4">
+                    {selectedFarmHistory.crops.map((crop) => (
+                      <div
+                        key={crop.id}
+                        className="bg-surface-50 dark:bg-surface-700 rounded-lg p-4 border border-surface-200 dark:border-surface-600"
+                      >
+                        <div className="flex items-start justify-between mb-3">
+                          <div>
+                            <h4 className="font-medium text-surface-900 dark:text-surface-100">
+                              {crop.cropName} - {crop.variety}
+                            </h4>
+                            <p className="text-sm text-surface-600 dark:text-surface-400">
+                              {crop.season}
+                            </p>
+                          </div>
+                          <span className={`px-2 py-1 rounded-lg text-xs font-medium ${getStatusColor(crop.status)}`}>
+                            {crop.status}
+                          </span>
+                        </div>
+                        
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                          <div>
+                            <span className="text-surface-600 dark:text-surface-400">Planted:</span>
+                            <p className="font-medium">{new Date(crop.plantingDate).toLocaleDateString()}</p>
+                          </div>
+                          <div>
+                            <span className="text-surface-600 dark:text-surface-400">Harvested:</span>
+                            <p className="font-medium">{crop.harvestDate ? new Date(crop.harvestDate).toLocaleDateString() : 'Pending'}</p>
+                          </div>
+                          <div>
+                            <span className="text-surface-600 dark:text-surface-400">Area:</span>
+                            <p className="font-medium">{crop.area} acres</p>
+                          </div>
+                          <div>
+                            <span className="text-surface-600 dark:text-surface-400">Yield:</span>
+                            <p className="font-medium">{crop.yieldAmount} {crop.yieldUnit}</p>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-8">
+                    <ApperIcon name="Archive" className="h-12 w-12 text-surface-400 mx-auto mb-4" />
+                    <p className="text-surface-600 dark:text-surface-400">No crop history found for this farm.</p>
+                  </div>
+                )}
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>

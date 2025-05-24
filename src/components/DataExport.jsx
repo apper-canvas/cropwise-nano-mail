@@ -8,7 +8,8 @@ const DataExport = ({ isOpen, onClose, farms, crops, tasks, expenses }) => {
   const [exportConfig, setExportConfig] = useState({
     dataTypes: {
       crops: true,
-      tasks: true,
+      cropHistory: true,
+      tasks: false,
       expenses: true
     },
     format: 'excel',
@@ -33,6 +34,21 @@ const DataExport = ({ isOpen, onClose, farms, crops, tasks, expenses }) => {
       'Assigned Farm': crop.assignedFarm || 'Not assigned',
       'Harvest Date': crop.harvestDate || 'Not harvested',
       'Yield (lbs)': crop.yield || 'Not recorded'
+    }))
+  }
+
+  const formatCropHistoryData = (cropHistoryData) => {
+    return cropHistoryData.map(crop => ({
+      'Farm Name': crop.farmName || 'Unknown',
+      'Crop Name': crop.cropName,
+      'Variety': crop.variety,
+      'Planting Date': crop.plantingDate,
+      'Harvest Date': crop.harvestDate || 'Not harvested',
+      'Area (acres)': crop.area,
+      'Yield Amount': crop.yieldAmount,
+      'Yield Unit': crop.yieldUnit,
+      'Season': crop.season,
+      'Status': crop.status
     }))
   }
 
@@ -137,6 +153,12 @@ const DataExport = ({ isOpen, onClose, farms, crops, tasks, expenses }) => {
         const filteredCrops = filterDataByDateRange(crops, 'plantingDate')
         const formattedCrops = formatCropData(filteredCrops)
         selectedData.push({ data: formattedCrops, sheetName: 'Crops', filename: 'crops' })
+      }
+      
+      if (exportConfig.dataTypes.cropHistory) {
+        const filteredCropHistory = filterDataByDateRange(crops, 'plantingDate')
+        const formattedCropHistory = formatCropHistoryData(filteredCropHistory)
+        selectedData.push({ data: formattedCropHistory, sheetName: 'Crop History', filename: 'crop_history' })
       }
       
       if (exportConfig.dataTypes.tasks) {
@@ -247,7 +269,8 @@ const DataExport = ({ isOpen, onClose, farms, crops, tasks, expenses }) => {
                         className="w-4 h-4 text-primary focus:ring-primary border-surface-300 rounded"
                       />
                       <span className="text-surface-700 dark:text-surface-300 capitalize">
-                        {type} ({type === 'crops' ? crops.length : type === 'tasks' ? tasks.length : expenses.length} records)
+                        {type === 'cropHistory' ? 'Crop History' : type} 
+                        ({type === 'crops' || type === 'cropHistory' ? crops.length : type === 'tasks' ? tasks.length : expenses.length} records)
                       </span>
                     </label>
                   ))}

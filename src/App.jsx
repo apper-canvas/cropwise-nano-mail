@@ -3,6 +3,7 @@ import { ToastContainer } from 'react-toastify'
 import Home from './pages/Home'
 import NotFound from './pages/NotFound'
 import Farm from './components/Farm'
+import CropHistory from './components/CropHistory'
 import FarmMap from './components/FarmMap'
 import 'react-toastify/dist/ReactToastify.css'
 
@@ -13,6 +14,8 @@ function App() {
         <Route path="/" element={<Home />} />
         <Route path="/farms" element={<Farm />} />
         <Route path="/farm-map" element={<FarmMap />} />
+        <Route path="/crop-history" element={<CropHistory />} />
+        <Route path="/crop-history/:farmId" element={<CropHistory />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
       

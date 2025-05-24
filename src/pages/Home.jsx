@@ -22,10 +22,11 @@ const Home = () => {
 
   const stats = [
     { label: "Active Farms", value: "3", icon: "MapPin", color: "text-primary" },
-    { label: "Pending Tasks", value: "12", icon: "Clock", color: "text-accent" },
-    { label: "Crop Varieties", value: "8", icon: "Sprout", color: "text-secondary" },
+    { label: "Crop Records", value: "18", icon: "Archive", color: "text-accent" },
+    { label: "Active Crops", value: "8", icon: "Sprout", color: "text-secondary" },
     { label: "This Month", value: "$2,450", icon: "DollarSign", color: "text-red-500" }
   ]
+
 
   return (
     <div className={`min-h-screen transition-colors duration-300 ${darkMode ? 'dark' : ''}`}>
