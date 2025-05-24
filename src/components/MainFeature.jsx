@@ -845,7 +845,8 @@ const MainFeature = () => {
             <ExpenseReport expenses={expenses} onExport={() => setShowExportModal(true)} />
           </motion.div>
         )}
-        </AnimatePresence>
+      </AnimatePresence>
+      </div>
       </div>
       
       {/* Export Modal */}
