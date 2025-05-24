@@ -1,0 +1,70 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+}
+
+@layer utilities {
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+  
+  .glass {
+    backdrop-filter: blur(12px);
+    background: rgba(255, 255, 255, 0.15);
+  }
+  
+  .text-shadow {
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+}
+
+/* Custom responsive styles */
+@media (max-width: 640px) {
+  .container {
+    @apply px-4;
+  }
+}
+
+@media (min-width: 641px) and (max-width: 768px) {
+  .container {
+    @apply px-6;
+  }
+}
+
+@media (min-width: 769px) {
+  .container {
+    @apply px-8;
+  }
+}
+
+/* Toast customization */
+.Toastify__toast {
+  @apply rounded-xl shadow-card;
+}
+
+.Toastify__toast--success {
+  @apply bg-primary text-white;
+}
+
+.Toastify__toast--error {
+  @apply bg-red-500 text-white;
+}
+
+.Toastify__toast--warning {
+  @apply bg-accent text-white;
+}
