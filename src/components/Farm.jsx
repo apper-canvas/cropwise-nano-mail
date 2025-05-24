@@ -716,4 +716,3 @@ const Farm = () => {
 }
 
 export default Farm
-      </AnimatePresence>
