@@ -47,6 +47,7 @@ const MainFeature = () => {
 
   const tabs = [
     { id: 'crops', label: 'Crops', icon: 'Sprout' },
+    { id: 'map', label: 'Farm Map', icon: 'Map' },
     { id: 'tasks', label: 'Tasks', icon: 'CheckSquare' },
     { id: 'expenses', label: 'Expenses', icon: 'DollarSign' }
   ]
@@ -316,6 +317,28 @@ const MainFeature = () => {
                   </motion.div>
                 ))}
               </div>
+            </motion.div>
+          )}
+
+          {/* Farm Map Tab */}
+          {activeTab === 'map' && (
+            <motion.div
+              key="map"
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 }}
+              className="text-center py-12"
+            >
+              <p className="text-surface-600 dark:text-surface-400 mb-4">
+                The interactive farm map is available as a dedicated page for the best experience.
+              </p>
+              <a
+                href="/farm-map"
+                className="inline-flex items-center gap-2 bg-primary hover:bg-primary-dark text-white px-6 py-3 rounded-xl transition-colors duration-300"
+              >
+                <ApperIcon name="Map" className="h-5 w-5" />
+                Open Farm Map
+              </a>
             </motion.div>
           )}
 

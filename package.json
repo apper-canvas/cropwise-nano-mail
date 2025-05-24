@@ -22,7 +22,9 @@
     "axios": "^1.6.0",
     "react-big-calendar": "^1.8.2",
     "moment": "^2.29.4",
-    "xlsx": "^0.18.5"
+    "xlsx": "^0.18.5",
+    "konva": "^9.2.0",
+    "react-konva": "^18.2.10"
   },
   "devDependencies": {
     "@types/react": "^18.2.15",
