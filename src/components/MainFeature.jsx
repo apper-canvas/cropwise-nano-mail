@@ -4,6 +4,7 @@ import { toast } from 'react-toastify'
 import ApperIcon from './ApperIcon'
 import CalendarView from './CalendarView'
 import DataExport from './DataExport'
+import KanbanView from './KanbanView'
 
 
 const MainFeature = () => {
@@ -65,7 +66,8 @@ const MainFeature = () => {
     { id: 'farms', label: 'Farms', icon: 'MapPin' },
     { id: 'crops', label: 'Crops', icon: 'Sprout' },
     { id: 'map', label: 'Farm Map', icon: 'Map' },
-    { id: 'tasks', label: 'Tasks', icon: 'CheckSquare' },
+    { id: 'tasks', label: 'Calendar', icon: 'Calendar' },
+    { id: 'kanban', label: 'Kanban', icon: 'Columns' },
     { id: 'expenses', label: 'Expenses', icon: 'DollarSign' }
   ]
 
@@ -624,6 +626,25 @@ const MainFeature = () => {
             </motion.div>
           )}
           {/* Expenses Tab */}
+          
+          {/* Kanban Tab */}
+          {activeTab === 'kanban' && (
+            <motion.div
+              key="kanban"
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 }}
+              className="space-y-6"
+            >
+              <KanbanView 
+                tasks={tasks} 
+                setTasks={setTasks} 
+                addWeatherTask={addWeatherTask} 
+                onExport={() => setShowExportModal(true)}
+              />
+            </motion.div>
+          )}
+          
           {activeTab === 'expenses' && (
             <motion.div
               key="expenses"
