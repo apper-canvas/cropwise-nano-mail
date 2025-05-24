@@ -861,16 +861,3 @@ const MainFeature = () => {
 }
 
 export default MainFeature
-      {/* Export Modal */}
-      <DataExport
-        isOpen={showExportModal}
-        onClose={() => setShowExportModal(false)}
-        farms={farms}
-        crops={crops}
-        tasks={tasks}
-        expenses={expenses}
-      />
-  )
-}
-
-export default MainFeature
