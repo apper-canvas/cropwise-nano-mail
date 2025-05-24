@@ -1,5 +1,13 @@
 import { useState, useEffect } from 'react'
-import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd'
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+} from '@dnd-kit/core'
+import { arrayMove, SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy } from '@dnd-kit/sortable'
 import { motion, AnimatePresence } from 'framer-motion'
 import { toast } from 'react-toastify'
 import ApperIcon from './ApperIcon'
@@ -33,6 +41,13 @@ const KanbanView = ({ tasks, setTasks, addWeatherTask, onExport }) => {
 
   const farmLocations = ['North Field', 'South Field', 'Greenhouse A', 'Greenhouse B']
   const assignees = ['John Doe', 'Jane Smith', 'Mike Johnson', 'Sarah Wilson']
+
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  )
 
   useEffect(() => {
     applyFilters()
@@ -94,18 +109,25 @@ const KanbanView = ({ tasks, setTasks, addWeatherTask, onExport }) => {
     setFilteredTasks(filtered)
   }
 
-  const handleDragEnd = (result) => {
-    const { destination, source, draggableId } = result
+  const handleDragEnd = (event) => {
+    const { active, over } = event
 
-    if (!destination) return
-    if (destination.droppableId === source.droppableId && destination.index === source.index) return
+    if (!over) return
 
-    const taskId = parseInt(draggableId)
-    const newStatus = destination.droppableId
+    const taskId = parseInt(active.id)
+    const newStatus = over.id
+    
+    // Check if we're dropping on a status column or another task
+    const isStatusColumn = statusColumns.some(col => col.id === over.id)
+    const finalStatus = isStatusColumn ? over.id : over.data?.current?.status || 'todo'
+    
+    // If dropping on the same status, don't do anything
+    const currentTask = tasks.find(task => task.id === taskId)
+    if (currentTask && currentTask.status === finalStatus) return
     
     const updatedTasks = tasks.map(task => 
       task.id === taskId 
-        ? { ...task, status: newStatus, completed: newStatus === 'done' }
+        ? { ...task, status: finalStatus, completed: finalStatus === 'done' }
         : task
     )
 
@@ -309,7 +331,7 @@ const KanbanView = ({ tasks, setTasks, addWeatherTask, onExport }) => {
       </div>
 
       {/* Kanban Board */}
-      <DragDropContext onDragEnd={handleDragEnd}>
+      <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
           {statusColumns.map((column) => (
             <div key={column.id} className={`${column.color} rounded-xl shadow-card overflow-hidden`}>
@@ -323,99 +345,20 @@ const KanbanView = ({ tasks, setTasks, addWeatherTask, onExport }) => {
               </div>
               
               <Droppable droppableId={column.id}>
-                {(provided, snapshot) => (
-                  <div
-                    ref={provided.innerRef}
-                    {...provided.droppableProps}
-                    className={`p-4 min-h-[500px] transition-colors duration-200 ${
-                      snapshot.isDraggingOver ? 'bg-primary/10' : ''
-                    }`}
-                  >
-                    {getTasksByStatus(column.id).map((task, index) => (
-                      <Draggable key={task.id} draggableId={task.id.toString()} index={index}>
-                        {(provided, snapshot) => (
-                          <motion.div
-                            ref={provided.innerRef}
-                            {...provided.draggableProps}
-                            {...provided.dragHandleProps}
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            className={`bg-white dark:bg-surface-800 rounded-lg shadow-card p-4 mb-3 transition-all duration-200 ${
-                              snapshot.isDragging ? 'rotate-3 shadow-lg scale-105' : 'hover:shadow-lg'
-                            }`}
-                          >
-                            <div className="flex items-start justify-between mb-2">
-                              <h4 className="font-semibold text-surface-900 dark:text-surface-100 text-sm">
-                                {task.title}
-                              </h4>
-                              <div className="flex gap-1">
-                                <button
-                                  onClick={() => handleEditTask(task)}
-                                  className="p-1 text-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded transition-colors"
-                                >
-                                  <ApperIcon name="Edit2" className="h-3 w-3" />
-                                </button>
-                                <button
-                                  onClick={() => handleDeleteTask(task.id)}
-                                  className="p-1 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded transition-colors"
-                                >
-                                  <ApperIcon name="Trash2" className="h-3 w-3" />
-                                </button>
-                              </div>
-                            </div>
-                            
-                            {task.description && (
-                              <p className="text-surface-600 dark:text-surface-400 text-xs mb-3">
-                                {task.description}
-                              </p>
-                            )}
-                            
-                            <div className="flex items-center justify-between mb-2">
-                              <span className={`px-2 py-1 rounded-full text-xs font-medium ${getPriorityColor(task.priority)}`}>
-                                {task.priority}
-                              </span>
-                              
-                              {(() => {
-                                const daysUntil = getDaysUntilDue(task.dueDate)
-                                return (
-                                  <span className={`text-xs font-medium ${
-                                    daysUntil < 0 ? 'text-red-500' : 
-                                    daysUntil === 0 ? 'text-yellow-500' : 
-                                    'text-surface-600 dark:text-surface-400'
-                                  }`}>
-                                    {daysUntil < 0 ? `${Math.abs(daysUntil)}d overdue` :
-                                     daysUntil === 0 ? 'Due today' :
-                                     `${daysUntil}d left`}
-                                  </span>
-                                )
-                              })()}
-                            </div>
-                            
-                            <div className="flex items-center justify-between text-xs text-surface-500 dark:text-surface-400">
-                              <div className="flex items-center gap-1">
-                                <ApperIcon name="MapPin" className="h-3 w-3" />
-                                {task.location || 'North Field'}
-                              </div>
-                              {task.assignee && (
-                                <div className="flex items-center gap-1">
-                                  <ApperIcon name="User" className="h-3 w-3" />
-                                  {task.assignee}
-                                </div>
-                              )}
-                            </div>
-                          </motion.div>
-                        )}
-                      </Draggable>
-                    ))}
-                    {provided.placeholder}
-                  </div>
-                )}
-              </Droppable>
-            </div>
+              <SortableContext items={getTasksByStatus(column.id).map(task => task.id)} strategy={verticalListSortingStrategy}>
+                <KanbanColumn
+                  column={column}
+                  tasks={getTasksByStatus(column.id)}
+                  onEditTask={handleEditTask}
+                  onDeleteTask={handleDeleteTask}
+                  getPriorityColor={getPriorityColor}
+                  getDaysUntilDue={getDaysUntilDue}
+                />
+              </SortableContext>
           ))}
         </div>
       </DragDropContext>
-
+      </DndContext>
       {/* Task Form Modal */}
       <AnimatePresence>
         {showTaskForm && (
@@ -572,6 +515,130 @@ const KanbanView = ({ tasks, setTasks, addWeatherTask, onExport }) => {
         )}
       </AnimatePresence>
     </div>
+  )
+}
+
+// Separate component for Kanban column to handle droppable area
+import { useDroppable } from '@dnd-kit/core'
+import { useSortable } from '@dnd-kit/sortable'
+import { CSS } from '@dnd-kit/utilities'
+
+const KanbanColumn = ({ column, tasks, onEditTask, onDeleteTask, getPriorityColor, getDaysUntilDue }) => {
+  const { setNodeRef, isOver } = useDroppable({
+    id: column.id,
+  })
+
+  return (
+    <div
+      ref={setNodeRef}
+      className={`p-4 min-h-[500px] transition-colors duration-200 ${
+        isOver ? 'bg-primary/10' : ''
+      }`}
+    >
+      {tasks.map((task) => (
+        <SortableTaskCard
+          key={task.id}
+          task={task}
+          onEditTask={onEditTask}
+          onDeleteTask={onDeleteTask}
+          getPriorityColor={getPriorityColor}
+          getDaysUntilDue={getDaysUntilDue}
+        />
+      ))}
+    </div>
+  )
+}
+
+const SortableTaskCard = ({ task, onEditTask, onDeleteTask, getPriorityColor, getDaysUntilDue }) => {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ 
+    id: task.id,
+    data: { status: task.status }
+  })
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+  }
+
+  return (
+    <motion.div
+      ref={setNodeRef}
+      style={style}
+      {...attributes}
+      {...listeners}
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      className={`bg-white dark:bg-surface-800 rounded-lg shadow-card p-4 mb-3 transition-all duration-200 cursor-grab active:cursor-grabbing ${
+        isDragging ? 'rotate-3 shadow-lg scale-105 opacity-50' : 'hover:shadow-lg'
+      }`}
+    >
+      <div className="flex items-start justify-between mb-2">
+        <h4 className="font-semibold text-surface-900 dark:text-surface-100 text-sm">
+          {task.title}
+        </h4>
+        <div className="flex gap-1">
+          <button
+            onClick={() => onEditTask(task)}
+            className="p-1 text-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded transition-colors"
+          >
+            <ApperIcon name="Edit2" className="h-3 w-3" />
+          </button>
+          <button
+            onClick={() => onDeleteTask(task.id)}
+            className="p-1 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded transition-colors"
+          >
+            <ApperIcon name="Trash2" className="h-3 w-3" />
+          </button>
+        </div>
+      </div>
+      
+      {task.description && (
+        <p className="text-surface-600 dark:text-surface-400 text-xs mb-3">
+          {task.description}
+        </p>
+      )}
+      
+      <div className="flex items-center justify-between mb-2">
+        <span className={`px-2 py-1 rounded-full text-xs font-medium ${getPriorityColor(task.priority)}`}>
+          {task.priority}
+        </span>
+        
+        {(() => {
+          const daysUntil = getDaysUntilDue(task.dueDate)
+          return (
+            <span className={`text-xs font-medium ${
+              daysUntil < 0 ? 'text-red-500' : 
+              daysUntil === 0 ? 'text-yellow-500' : 
+              'text-surface-600 dark:text-surface-400'
+            }`}>
+              {daysUntil < 0 ? `${Math.abs(daysUntil)}d overdue` :
+               daysUntil === 0 ? 'Due today' :
+               `${daysUntil}d left`}
+            </span>
+          )
+        })()}
+      </div>
+      
+      <div className="flex items-center justify-between text-xs text-surface-500 dark:text-surface-400">
+        <div className="flex items-center gap-1">
+          <ApperIcon name="MapPin" className="h-3 w-3" />
+          {task.location || 'North Field'}
+        </div>
+        {task.assignee && (
+          <div className="flex items-center gap-1">
+            <ApperIcon name="User" className="h-3 w-3" />
+            {task.assignee}
+          </div>
+        )}
+      </div>
+    </motion.div>
   )
 }
 
