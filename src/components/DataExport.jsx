@@ -212,22 +212,24 @@ const DataExport = ({ isOpen, onClose, farms, crops, tasks, expenses }) => {
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
           exit={{ opacity: 0, scale: 0.95 }}
-          className="bg-white dark:bg-surface-800 rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto"
+          className="bg-white dark:bg-surface-800 rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] flex flex-col"
           onClick={(e) => e.stopPropagation()}
         >
-          <div className="p-6">
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-2xl font-bold text-surface-900 dark:text-surface-100">
-                Export Farm Data
-              </h2>
-              <button
-                onClick={onClose}
-                className="p-2 hover:bg-surface-100 dark:hover:bg-surface-700 rounded-lg transition-colors"
-              >
-                <ApperIcon name="X" className="h-5 w-5" />
-              </button>
-            </div>
+          {/* Fixed Header */}
+          <div className="flex items-center justify-between p-6 border-b border-surface-200 dark:border-surface-700 flex-shrink-0">
+            <h2 className="text-2xl font-bold text-surface-900 dark:text-surface-100">
+              Export Farm Data
+            </h2>
+            <button
+              onClick={onClose}
+              className="p-2 hover:bg-surface-100 dark:hover:bg-surface-700 rounded-lg transition-colors"
+            >
+              <ApperIcon name="X" className="h-5 w-5" />
+            </button>
+          </div>
 
+          {/* Scrollable Content */}
+          <div className="flex-1 overflow-y-auto p-6">
             <div className="space-y-6">
               {/* Data Types Selection */}
               <div>
@@ -277,6 +279,97 @@ const DataExport = ({ isOpen, onClose, farms, crops, tasks, expenses }) => {
                     />
                     <span className="text-surface-700 dark:text-surface-300">CSV</span>
                   </label>
+                </div>
+              </div>
+
+              {/* Date Range Filter */}
+              <div>
+                <h3 className="text-lg font-semibold text-surface-900 dark:text-surface-100 mb-3">
+                  Date Range Filter (Optional)
+                </h3>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1">
+                      Start Date
+                    </label>
+                    <input
+                      type="date"
+                      value={exportConfig.dateRange.start}
+                      onChange={(e) => handleConfigChange('dateRange.start', e.target.value)}
+                      className="w-full px-3 py-2 border border-surface-300 dark:border-surface-600 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent dark:bg-surface-800 dark:text-surface-100"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1">
+                      End Date
+                    </label>
+                    <input
+                      type="date"
+                      value={exportConfig.dateRange.end}
+                      onChange={(e) => handleConfigChange('dateRange.end', e.target.value)}
+                      className="w-full px-3 py-2 border border-surface-300 dark:border-surface-600 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent dark:bg-surface-800 dark:text-surface-100"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Export Options */}
+              <div className="space-y-3">
+                <h3 className="text-lg font-semibold text-surface-900 dark:text-surface-100 mb-3">
+                  Export Options
+                </h3>
+                <label className="flex items-center gap-3">
+                  <input
+                    type="checkbox"
+                    checked={exportConfig.includeHeaders}
+                    onChange={(e) => handleConfigChange('includeHeaders', e.target.checked)}
+                    className="w-4 h-4 text-primary focus:ring-primary border-surface-300 rounded"
+                  />
+                  <span className="text-surface-700 dark:text-surface-300">Include column headers</span>
+                </label>
+                {exportConfig.format === 'excel' && (
+                  <label className="flex items-center gap-3">
+                    <input
+                      type="checkbox"
+                      checked={exportConfig.separateSheets}
+                      onChange={(e) => handleConfigChange('separateSheets', e.target.checked)}
+                      className="w-4 h-4 text-primary focus:ring-primary border-surface-300 rounded"
+                    />
+                    <span className="text-surface-700 dark:text-surface-300">Use separate sheets</span>
+                  </label>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* Fixed Footer */}
+          <div className="p-6 border-t border-surface-200 dark:border-surface-700 flex-shrink-0">
+            <div className="flex flex-col sm:flex-row gap-3">
+              <button
+                onClick={handleExport}
+                disabled={isExporting}
+                className="flex-1 flex items-center justify-center gap-2 bg-primary hover:bg-primary-dark text-white px-6 py-3 rounded-xl transition-colors duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {isExporting ? (
+                  <>
+                    <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
+                    Exporting...
+                  </>
+                ) : (
+                  <>
+                    <ApperIcon name="Download" className="h-5 w-5" />
+                    Export Data
+                  </>
+                )}
+              </button>
+              <button
+                onClick={onClose}
+                className="px-6 py-3 border border-surface-300 dark:border-surface-600 text-surface-700 dark:text-surface-300 rounded-xl hover:bg-surface-50 dark:hover:bg-surface-700 transition-colors duration-300"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
                 </div>
               </div>
 
