@@ -314,146 +314,15 @@ const MainFeature = () => {
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -20 }}
-              className="space-y-4 sm:space-y-6"
+              className="space-y-6"
             >
-              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                <h2 className="text-xl sm:text-2xl font-bold text-surface-900 dark:text-surface-100">
-                  Task Management
-                </h2>
-                <div className="flex flex-col sm:flex-row gap-2">
-                  <button
-                    onClick={addWeatherTask}
-                    className="flex items-center gap-2 bg-blue-500 hover:bg-blue-600 text-white px-3 py-2 rounded-lg transition-colors duration-300 text-sm"
-                  >
-                    <ApperIcon name="Cloud" className="h-4 w-4" />
-                    Weather Task
-                  </button>
-                  <button
-                    onClick={() => setShowTaskForm(!showTaskForm)}
-                    className="flex items-center gap-2 bg-primary hover:bg-primary-dark text-white px-4 py-2 rounded-xl transition-colors duration-300 w-fit"
-                  >
-                    <ApperIcon name="Plus" className="h-4 w-4" />
-                    Add Task
-                  </button>
-                </div>
-              </div>
-
-              {/* Add Task Form */}
-              <AnimatePresence>
-                {showTaskForm && (
-                  <motion.form
-                    initial={{ opacity: 0, height: 0 }}
-                    animate={{ opacity: 1, height: 'auto' }}
-                    exit={{ opacity: 0, height: 0 }}
-                    onSubmit={handleAddTask}
-                    className="bg-surface-50 dark:bg-surface-900 p-4 sm:p-6 rounded-xl space-y-4"
-                  >
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                      <div className="sm:col-span-2 lg:col-span-1">
-                        <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-2">
-                          Task Title
-                        </label>
-                        <input
-                          type="text"
-                          value={newTask.title}
-                          onChange={(e) => setNewTask({...newTask, title: e.target.value})}
-                          className="w-full px-3 py-2 border border-surface-300 dark:border-surface-600 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent dark:bg-surface-800 dark:text-surface-100"
-                          placeholder="e.g., Water Tomatoes"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-2">
-                          Due Date
-                        </label>
-                        <input
-                          type="date"
-                          value={newTask.dueDate}
-                          onChange={(e) => setNewTask({...newTask, dueDate: e.target.value})}
-                          className="w-full px-3 py-2 border border-surface-300 dark:border-surface-600 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent dark:bg-surface-800 dark:text-surface-100"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-2">
-                          Priority
-                        </label>
-                        <select
-                          value={newTask.priority}
-                          onChange={(e) => setNewTask({...newTask, priority: e.target.value})}
-                          className="w-full px-3 py-2 border border-surface-300 dark:border-surface-600 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent dark:bg-surface-800 dark:text-surface-100"
-                        >
-                          <option value="Low">Low</option>
-                          <option value="Medium">Medium</option>
-                          <option value="High">High</option>
-                        </select>
-                      </div>
-                    </div>
-                    <div className="flex flex-col sm:flex-row gap-3">
-                      <button
-                        type="submit"
-                        className="flex items-center justify-center gap-2 bg-primary hover:bg-primary-dark text-white px-4 py-2 rounded-lg transition-colors duration-300"
-                      >
-                        <ApperIcon name="Check" className="h-4 w-4" />
-                        Add Task
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => setShowTaskForm(false)}
-                        className="flex items-center justify-center gap-2 bg-surface-200 hover:bg-surface-300 text-surface-700 px-4 py-2 rounded-lg transition-colors duration-300"
-                      >
-                        <ApperIcon name="X" className="h-4 w-4" />
-                        Cancel
-                      </button>
-                    </div>
-                  </motion.form>
-                )}
-              </AnimatePresence>
-
-              {/* Tasks List */}
-              <div className="space-y-3 sm:space-y-4">
-                {tasks.map((task) => (
-                  <motion.div
-                    key={task.id}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className={`bg-white dark:bg-surface-800 p-4 sm:p-6 rounded-xl shadow-card hover:shadow-lg transition-all duration-300 ${
-                      task.completed ? 'opacity-75' : ''
-                    }`}
-                  >
-                    <div className="flex flex-col sm:flex-row sm:items-center gap-4">
-                      <button
-                        onClick={() => toggleTask(task.id)}
-                        className={`flex-shrink-0 w-6 h-6 rounded-full border-2 flex items-center justify-center transition-colors duration-300 ${
-                          task.completed
-                            ? 'bg-primary border-primary text-white'
-                            : 'border-surface-300 hover:border-primary'
-                        }`}
-                      >
-                        {task.completed && <ApperIcon name="Check" className="h-3 w-3" />}
-                      </button>
-                      
-                      <div className="flex-1 min-w-0">
-                        <h3 className={`font-semibold text-surface-900 dark:text-surface-100 ${
-                          task.completed ? 'line-through' : ''
-                        }`}>
-                          {task.title}
-                        </h3>
-                        <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 mt-1">
-                          <div className="flex items-center gap-1 text-sm text-surface-600 dark:text-surface-400">
-                            <ApperIcon name="Calendar" className="h-4 w-4" />
-                            {new Date(task.dueDate).toLocaleDateString()}
-                          </div>
-                          <span className={`px-2 py-1 rounded-lg text-xs font-medium w-fit ${getPriorityColor(task.priority)}`}>
-                            {task.priority}
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                  </motion.div>
-                ))}
-              </div>
+              <CalendarView 
+                tasks={tasks} 
+                setTasks={setTasks} 
+                addWeatherTask={addWeatherTask} 
+              />
             </motion.div>
           )}
-
           {/* Expenses Tab */}
           {activeTab === 'expenses' && (
             <motion.div

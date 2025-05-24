@@ -96,3 +96,87 @@
     @apply grid-cols-2 gap-3;
   }
 }
+
+/* Calendar View Styles */
+.calendar-custom .rbc-calendar {
+  @apply bg-transparent;
+}
+
+.calendar-custom .rbc-header {
+  @apply bg-surface-100 dark:bg-surface-700 text-surface-900 dark:text-surface-100 font-semibold py-3;
+  border-bottom: 1px solid theme('colors.surface.300');
+}
+
+.calendar-custom .rbc-today {
+  @apply bg-primary/10;
+}
+
+.calendar-custom .rbc-off-range-bg {
+  @apply bg-surface-50 dark:bg-surface-900;
+}
+
+.calendar-custom .rbc-date-cell {
+  @apply text-surface-600 dark:text-surface-400;
+}
+
+.calendar-custom .rbc-button-link {
+  @apply text-surface-900 dark:text-surface-100;
+}
+
+.calendar-custom .rbc-event {
+  @apply rounded-md border-none;
+}
+
+.calendar-custom .rbc-slot-selection {
+  @apply bg-primary/20;
+}
+
+.calendar-custom .rbc-time-view .rbc-time-gutter {
+  @apply bg-surface-50 dark:bg-surface-800;
+}
+
+.calendar-custom .rbc-time-view .rbc-time-content {
+  @apply border-surface-300 dark:border-surface-600;
+}
+
+.calendar-custom .rbc-time-slot {
+  @apply border-surface-200 dark:border-surface-700;
+}
+
+.calendar-custom .rbc-time-header {
+  @apply border-surface-300 dark:border-surface-600;
+}
+
+.calendar-custom .rbc-toolbar {
+  @apply mb-4 p-4 bg-surface-50 dark:bg-surface-800 rounded-lg;
+}
+
+.calendar-custom .rbc-toolbar button {
+  @apply px-3 py-2 rounded-lg bg-white dark:bg-surface-700 text-surface-700 dark:text-surface-200 border border-surface-300 dark:border-surface-600 hover:bg-surface-50 dark:hover:bg-surface-600 transition-colors duration-200;
+}
+
+.calendar-custom .rbc-toolbar button.rbc-active {
+  @apply bg-primary text-white border-primary;
+}
+
+.calendar-custom .rbc-toolbar-label {
+  @apply text-xl font-bold text-surface-900 dark:text-surface-100;
+}
+
+.calendar-custom .rbc-show-more {
+  @apply text-primary hover:text-primary-dark;
+}
+
+.calendar-custom .rbc-day-slot .rbc-events-container {
+  @apply mr-1;
+}
+
+/* Dark mode calendar adjustments */
+.dark .calendar-custom .rbc-calendar {
+  color: theme('colors.surface.100');
+}
+
+.dark .calendar-custom .rbc-month-view,
+.dark .calendar-custom .rbc-time-view {
+  background-color: transparent;
+}
