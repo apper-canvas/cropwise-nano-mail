@@ -88,17 +88,18 @@ const CalendarView = ({ tasks, setTasks, addWeatherTask }) => {
   const handleSelectSlot = useCallback(({ start, end }) => {
     setSelectedSlot({ start, end })
     setNewEvent({
-      ...newEvent,
+      title: '',
       start,
       end,
-      title: '',
       priority: 'Medium',
       location: 'North Field',
       notes: '',
-      recurring: false
+      recurring: false,
+      recurringType: 'weekly',
+      recurringEnd: ''
     })
     setShowEventModal(true)
-  }, [newEvent])
+  }, [])
 
   const handleSelectEvent = useCallback((event) => {
     setSelectedEvent(event)
