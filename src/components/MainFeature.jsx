@@ -845,9 +845,8 @@ const MainFeature = () => {
           </motion.div>
         )}
         </AnimatePresence>
+      </div>
     </div>
-      </div>
-      </div>
       
       {/* Export Modal */}
       <DataExport
