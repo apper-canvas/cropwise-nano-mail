@@ -697,7 +697,6 @@ const FarmMap = () => {
             </div>
           </div>
         </div>
-        </div>
       )}
 
       {/* Task Modal */}
