@@ -23,6 +23,7 @@ const FarmMap = () => {
   const [fields, setFields] = useState([])
   const [crops, setCrops] = useState([])
   const [tasks, setTasks] = useState([])
+  const [farms, setFarms] = useState([{id: 1, name: 'Main Farm'}, {id: 2, name: 'North Farm'}, {id: 3, name: 'South Farm'}])
   const [isDrawing, setIsDrawing] = useState(false)
   const [currentField, setCurrentField] = useState(null)
   const [selectedTool, setSelectedTool] = useState('select')
@@ -49,7 +50,6 @@ const FarmMap = () => {
     variety: '',
     plantingDate: '',
     expectedHarvestDate: '',
-    notes: ''
     notes: ''
   })
 
@@ -194,7 +194,6 @@ const FarmMap = () => {
       expectedHarvestDate: '',
       notes: ''
       notes: ''
-    })
     toast.success('Crop added successfully!')
   }
 
@@ -603,13 +602,13 @@ const FarmMap = () => {
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Assigned Farm</label>
                 <select
-                  value={cropForm.fieldId}
-                  onChange={(e) => setCropForm({...cropForm, fieldId: e.target.value})}
+                  value={cropForm.assignedFarm}
+                  onChange={(e) => setCropForm({...cropForm, assignedFarm: e.target.value})}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
                 >
-                  <option value="">Select a field</option>
-                  {fields.map(field => (
-                    <option key={field.id} value={field.id}>{field.name}</option>
+                  <option value="">Select a farm</option>
+                  {farms.map(farm => (
+                    <option key={farm.id} value={farm.id}>{farm.name}</option>
                   ))}
                 </select>
               </div>
@@ -644,7 +643,8 @@ const FarmMap = () => {
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
                 />
               </div>
-              <div className="flex space-x-3">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Expected Harvest Date</label>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Expected Harvest Date</label>
                 <input
@@ -664,6 +664,7 @@ const FarmMap = () => {
                   placeholder="Additional notes about this crop..."
                 ></textarea>
               </div>
+              <div className="flex space-x-3">
                 <button
                   onClick={handleCropSave}
                   className="flex-1 bg-emerald-600 text-white px-4 py-2 rounded-lg hover:bg-emerald-700"
