@@ -5,6 +5,7 @@ import ApperIcon from './ApperIcon'
 import CalendarView from './CalendarView'
 import DataExport from './DataExport'
 import KanbanView from './KanbanView'
+import ExpenseReport from './ExpenseReport'
 
 
 const MainFeature = () => {
@@ -70,7 +71,8 @@ const MainFeature = () => {
     { id: 'map', label: 'Farm Map', icon: 'Map' },
     { id: 'tasks', label: 'Calendar', icon: 'Calendar' },
     { id: 'kanban', label: 'Kanban', icon: 'Columns' },
-    { id: 'expenses', label: 'Expenses', icon: 'DollarSign' }
+    { id: 'expenses', label: 'Expenses', icon: 'DollarSign' },
+    { id: 'expense-report', label: 'Reports', icon: 'BarChart3' }
   ]
 
   const handleAddCrop = (e) => {
@@ -829,6 +831,20 @@ const MainFeature = () => {
               </div>
             </motion.div>
           )}
+        </AnimatePresence>
+        
+        {/* Expense Report Tab */}
+        {activeTab === 'expense-report' && (
+          <motion.div
+            key="expense-report"
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -20 }}
+            className="space-y-6"
+          >
+            <ExpenseReport expenses={expenses} onExport={() => setShowExportModal(true)} />
+          </motion.div>
+        )}
         </AnimatePresence>
       </div>
       
