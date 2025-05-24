@@ -173,18 +173,18 @@ const Farm = () => {
     setViewingFarm(farm)
   }
 
+  const handleViewCropHistory = (farmId) => {
+    const farmCropHistory = cropHistory.filter(crop => crop.farmId === farmId)
+    setSelectedFarmHistory({ farmId, crops: farmCropHistory })
+    setShowCropHistoryModal(true)
+  }
+
   const filteredFarms = farms
     .filter(farm => {
       const matchesSearch = farm.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                            farm.location.toLowerCase().includes(searchTerm.toLowerCase())
-    const farmCropHistory = cropHistory.filter(crop => crop.farmId === farmId)
-    setSelectedFarmHistory({ farmId, crops: farmCropHistory })
-    setShowCropHistoryModal(true)
+      const matchesType = filterType === 'all' || farm.type === filterType
       return matchesSearch && matchesType
-  
-  const getStatusColor = (status) => {
-    return status === 'Harvested' ? 'text-green-500 bg-green-50' : 'text-yellow-500 bg-yellow-50'
-  }
     })
     .sort((a, b) => {
       switch (sortBy) {
@@ -204,6 +204,7 @@ const Farm = () => {
       case 'Active': return 'text-green-500 bg-green-50'
       case 'Inactive': return 'text-gray-500 bg-gray-50'
       case 'Planning': return 'text-blue-500 bg-blue-50'
+      case 'Harvested': return 'text-green-500 bg-green-50'
       default: return 'text-gray-500 bg-gray-50'
     }
   }
@@ -211,14 +212,14 @@ const Farm = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-green-50 to-teal-50 dark:from-surface-900 dark:via-surface-800 dark:to-surface-900">
       {/* Header */}
-  const getFarmStatusColor = (status) => {
-    switch (status) {
-      case 'Active': return 'text-green-500 bg-green-50'
-      case 'Inactive': return 'text-gray-500 bg-gray-50'
-      case 'Planning': return 'text-blue-500 bg-blue-50'
-      default: return 'text-gray-500 bg-gray-50'
-    }
-  }
+      <header className="bg-white/80 dark:bg-surface-800/80 backdrop-blur-sm border-b border-surface-200 dark:border-surface-700">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-4">
+          <div className="flex items-center justify-between">
+            <div className="w-32">
+              <Link
+                to="/"
+                className="flex items-center gap-2 text-surface-600 hover:text-primary transition-colors"
+              >
                 <ApperIcon name="ArrowLeft" className="h-5 w-5" />
                 Back to Dashboard
               </Link>
@@ -479,7 +480,7 @@ const Farm = () => {
                       <ApperIcon name="Calendar" className="h-4 w-4" />
                       Est. {new Date(farm.established).getFullYear()}
                     </div>
-                    <span className={`px-2 py-1 rounded-lg text-xs font-medium ${getFarmStatusColor(farm.status)}`}>
+                    {farm.description && (
                       <p className="text-sm text-surface-600 dark:text-surface-400 line-clamp-2">
                         {farm.description}
                       </p>
@@ -493,6 +494,13 @@ const Farm = () => {
                     >
                       <ApperIcon name="Eye" className="h-4 w-4" />
                       View
+                    </button>
+                    <button
+                      onClick={() => handleViewCropHistory(farm.id)}
+                      className="flex items-center gap-1 text-purple-500 hover:bg-purple-50 dark:hover:bg-purple-900/20 px-2 py-1 rounded-lg transition-colors duration-300 text-sm"
+                    >
+                      <ApperIcon name="Archive" className="h-4 w-4" />
+                      History
                     </button>
                     <button
                       onClick={() => handleEditFarm(farm)}
@@ -525,20 +533,82 @@ const Farm = () => {
         </div>
       </main>
 
-      {/* Export Modal */}
-      <DataExport
-        isOpen={showExportModal}
-        onClose={() => setShowExportModal(false)}
-        farms={farms}
-        crops={[]}
-        tasks={[]}
-        expenses={[]}
-      />
-    </div>
-  )
-}
+      {/* View Farm Modal */}
+      <AnimatePresence>
+        {viewingFarm && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50"
+            onClick={() => setViewingFarm(null)}
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              onClick={(e) => e.stopPropagation()}
+              className="bg-white dark:bg-surface-800 rounded-xl shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto"
+            >
+              <div className="p-6">
+                <div className="flex items-center justify-between mb-6">
+                  <h3 className="text-xl font-semibold text-surface-900 dark:text-surface-100">
+                    Farm Details
+                  </h3>
+                  <button
+                    onClick={() => setViewingFarm(null)}
+                    className="p-2 hover:bg-surface-100 dark:hover:bg-surface-700 rounded-lg transition-colors"
+                  >
+                    <ApperIcon name="X" className="h-5 w-5" />
+                  </button>
+                </div>
+                
+                <div className="space-y-4">
+                  <div>
+                    <h4 className="font-medium text-surface-900 dark:text-surface-100 mb-2">
+                      {viewingFarm.name}
+                    </h4>
+                    <div className="grid grid-cols-2 gap-4 text-sm">
+                      <div>
+                        <span className="text-surface-600 dark:text-surface-400">Location:</span>
+                        <p className="font-medium">{viewingFarm.location}</p>
+                      </div>
+                      <div>
+                        <span className="text-surface-600 dark:text-surface-400">Size:</span>
+                        <p className="font-medium">{viewingFarm.size} acres</p>
+                      </div>
+                      <div>
+                        <span className="text-surface-600 dark:text-surface-400">Type:</span>
+                        <p className="font-medium">{viewingFarm.type}</p>
+                      </div>
+                      <div>
+                        <span className="text-surface-600 dark:text-surface-400">Established:</span>
+                        <p className="font-medium">{new Date(viewingFarm.established).toLocaleDateString()}</p>
+                      </div>
+                      <div>
+                        <span className="text-surface-600 dark:text-surface-400">Soil Type:</span>
+                        <p className="font-medium">{viewingFarm.soilType}</p>
+                      </div>
+                      <div>
+                        <span className="text-surface-600 dark:text-surface-400">Irrigation:</span>
+                        <p className="font-medium">{viewingFarm.irrigationType}</p>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  {viewingFarm.description && (
+                    <div>
+                      <span className="text-surface-600 dark:text-surface-400">Description:</span>
+                      <p className="font-medium mt-1">{viewingFarm.description}</p>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
-export default Farm
       {/* Crop History Modal */}
       <AnimatePresence>
         {showCropHistoryModal && selectedFarmHistory && (
@@ -562,13 +632,13 @@ export default Farm
                     Crop History - {farms.find(f => f.id === selectedFarmHistory.farmId)?.name}
                   </h3>
                   <div className="flex gap-2">
-                    <button
-                      onClick={() => navigate(`/crop-history/${selectedFarmHistory.farmId}`)}
+                    <Link
+                      to={`/crop-history/${selectedFarmHistory.farmId}`}
                       className="flex items-center gap-2 bg-primary hover:bg-primary-dark text-white px-4 py-2 rounded-lg transition-colors duration-300"
                     >
                       <ApperIcon name="ExternalLink" className="h-4 w-4" />
                       View Full History
-                    </button>
+                    </Link>
                     <button
                       onClick={() => setShowCropHistoryModal(false)}
                       className="p-2 hover:bg-surface-100 dark:hover:bg-surface-700 rounded-lg transition-colors"
@@ -630,4 +700,20 @@ export default Farm
             </motion.div>
           </motion.div>
         )}
+      </AnimatePresence>
+
+      {/* Export Modal */}
+      <DataExport
+        isOpen={showExportModal}
+        onClose={() => setShowExportModal(false)}
+        farms={farms}
+        crops={[]}
+        tasks={[]}
+        expenses={[]}
+      />
+    </div>
+  )
+}
+
+export default Farm
       </AnimatePresence>
