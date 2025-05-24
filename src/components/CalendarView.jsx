@@ -102,7 +102,6 @@ const CalendarView = ({ tasks, setTasks, addWeatherTask, onExport }) => {
       recurringEnd: '',
       taskType: 'watering',
       assignedCropFarm: ''
-      recurringEnd: ''
     })
     setShowEventModal(true)
   }, [])
