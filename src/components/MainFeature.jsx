@@ -846,8 +846,21 @@ const MainFeature = () => {
         )}
         </AnimatePresence>
       </div>
-    </div>
 
+      {/* Export Modal */}
+      <DataExport
+        isOpen={showExportModal}
+        onClose={() => setShowExportModal(false)}
+        farms={farms}
+        crops={crops}
+        tasks={tasks}
+        expenses={expenses}
+      />
+    </div>
+  )
+}
+
+export default MainFeature
       {/* Export Modal */}
       <DataExport
         isOpen={showExportModal}
