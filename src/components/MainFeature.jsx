@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { toast } from 'react-toastify'
 import ApperIcon from './ApperIcon'
+import CalendarView from './CalendarView'
 
 const MainFeature = () => {
   const [activeTab, setActiveTab] = useState('crops')
