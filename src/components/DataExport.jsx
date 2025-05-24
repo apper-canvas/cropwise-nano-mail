@@ -212,7 +212,7 @@ const DataExport = ({ isOpen, onClose, farms, crops, tasks, expenses }) => {
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
           exit={{ opacity: 0, scale: 0.95 }}
-          className="bg-white dark:bg-surface-800 rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] flex flex-col"
+          className="bg-white dark:bg-surface-800 rounded-2xl shadow-2xl max-w-2xl w-full max-h-[85vh] min-h-[60vh] flex flex-col"
           onClick={(e) => e.stopPropagation()}
         >
           {/* Fixed Header */}
@@ -229,7 +229,7 @@ const DataExport = ({ isOpen, onClose, farms, crops, tasks, expenses }) => {
           </div>
 
           {/* Scrollable Content */}
-          <div className="flex-1 overflow-y-auto p-6">
+          <div className="flex-1 overflow-y-auto p-6 min-h-0">
             <div className="space-y-6">
               {/* Data Types Selection */}
               <div>
