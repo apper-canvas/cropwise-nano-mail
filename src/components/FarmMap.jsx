@@ -575,7 +575,9 @@ const FarmMap = () => {
       {/* Crop Modal */}
       {showCropModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-xl p-6 w-full max-w-md">
+          <div className="bg-white rounded-xl w-full max-w-md max-h-[90vh] flex flex-col">
+            {/* Modal Header */}
+            <div className="flex-shrink-0 p-6 border-b border-gray-200">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-xl font-semibold text-gray-900">Add Crop</h2>
               <button
@@ -585,7 +587,12 @@ const FarmMap = () => {
                 <X className="w-5 h-5" />
               </button>
             </div>
+            </div>
+            
+            {/* Modal Content - Scrollable */}
+            <div className="flex-1 overflow-y-auto p-6">
             <div className="space-y-4">
+              {/* Field Selection */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Field</label>
                 <select
@@ -599,6 +606,7 @@ const FarmMap = () => {
                   ))}
                 </select>
               </div>
+              {/* Assigned Farm */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Assigned Farm</label>
                 <select
@@ -612,6 +620,7 @@ const FarmMap = () => {
                   ))}
                 </select>
               </div>
+              {/* Crop Type */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Crop Type</label>
                 <select
@@ -625,6 +634,7 @@ const FarmMap = () => {
                   ))}
                 </select>
               </div>
+              {/* Variety */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Variety</label>
                 <input
@@ -634,6 +644,7 @@ const FarmMap = () => {
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
                 />
               </div>
+              {/* Planting Date */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Planting Date</label>
                 <input
@@ -643,6 +654,7 @@ const FarmMap = () => {
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
                 />
               </div>
+              {/* Expected Harvest Date */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Expected Harvest Date</label>
                 <input
@@ -652,6 +664,7 @@ const FarmMap = () => {
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
                 />
               </div>
+              {/* Notes */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Notes</label>
                 <textarea
@@ -662,6 +675,11 @@ const FarmMap = () => {
                   placeholder="Additional notes about this crop..."
                 ></textarea>
               </div>
+            </div>
+            </div>
+            
+            {/* Modal Footer */}
+            <div className="flex-shrink-0 p-6 border-t border-gray-200">
               <div className="flex space-x-3">
                 <button
                   onClick={handleCropSave}
@@ -676,6 +694,7 @@ const FarmMap = () => {
                   Cancel
                 </button>
               </div>
+            </div>
             </div>
           </div>
         </div>
