@@ -133,7 +133,6 @@ const MainFeature = () => {
     }
   }
 
-  return (
   const addWeatherTask = async () => {
     // Mock weather-based task suggestions
     const suggestions = [
@@ -150,9 +149,9 @@ const MainFeature = () => {
     }
   }
 
+  return (
     <div className="bg-white/80 dark:bg-surface-800/80 backdrop-blur-sm rounded-2xl shadow-neu-light dark:shadow-neu-dark overflow-hidden">
       {/* Tab Navigation */}
-  const addWeatherTask = async () => {
         <div className="flex overflow-x-auto scrollbar-hide">
           {tabs.map((tab) => (
             <button
@@ -169,7 +168,6 @@ const MainFeature = () => {
             </button>
           ))}
         </div>
-      </div>
 
       {/* Tab Content */}
       <div className="p-4 sm:p-6 lg:p-8">
