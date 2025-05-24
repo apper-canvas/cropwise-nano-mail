@@ -847,7 +847,7 @@ const MainFeature = () => {
         </AnimatePresence>
       </div>
     </div>
-      
+
       {/* Export Modal */}
       <DataExport
         isOpen={showExportModal}
