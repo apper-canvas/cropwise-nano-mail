@@ -36,7 +36,9 @@ const MainFeature = () => {
     name: '',
     variety: '',
     plantingDate: '',
-    area: ''
+    area: '',
+    expectedHarvestDate: '',
+    assignedFarm: ''
   })
 
   const [newTask, setNewTask] = useState({
@@ -73,7 +75,7 @@ const MainFeature = () => {
 
   const handleAddCrop = (e) => {
     e.preventDefault()
-    if (!newCrop.name || !newCrop.variety || !newCrop.plantingDate || !newCrop.area) {
+    if (!newCrop.name || !newCrop.variety || !newCrop.plantingDate || !newCrop.area || !newCrop.expectedHarvestDate || !newCrop.assignedFarm) {
       toast.error('Please fill in all fields')
       return
     }
@@ -86,7 +88,7 @@ const MainFeature = () => {
     }
 
     setCrops([...crops, crop])
-    setNewCrop({ name: '', variety: '', plantingDate: '', area: '' })
+    setNewCrop({ name: '', variety: '', plantingDate: '', area: '', expectedHarvestDate: '', assignedFarm: '' })
     setShowCropForm(false)
     toast.success('Crop added successfully!')
   }
@@ -483,7 +485,7 @@ const MainFeature = () => {
                     onSubmit={handleAddCrop}
                     className="bg-surface-50 dark:bg-surface-900 p-4 sm:p-6 rounded-xl space-y-4"
                   >
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                       <div>
                         <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-2">
                           Crop Name
@@ -531,6 +533,32 @@ const MainFeature = () => {
                           className="w-full px-3 py-2 border border-surface-300 dark:border-surface-600 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent dark:bg-surface-800 dark:text-surface-100"
                           placeholder="0.0"
                         />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-2">
+                          Expected Harvest Date
+                        </label>
+                        <input
+                          type="date"
+                          value={newCrop.expectedHarvestDate}
+                          onChange={(e) => setNewCrop({...newCrop, expectedHarvestDate: e.target.value})}
+                          className="w-full px-3 py-2 border border-surface-300 dark:border-surface-600 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent dark:bg-surface-800 dark:text-surface-100"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-2">
+                          Assigned Farm
+                        </label>
+                        <select
+                          value={newCrop.assignedFarm}
+                          onChange={(e) => setNewCrop({...newCrop, assignedFarm: e.target.value})}
+                          className="w-full px-3 py-2 border border-surface-300 dark:border-surface-600 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent dark:bg-surface-800 dark:text-surface-100"
+                        >
+                          <option value="">Select Farm</option>
+                          {farms.map((farm) => (
+                            <option key={farm.id} value={farm.name}>{farm.name}</option>
+                          ))}
+                        </select>
                       </div>
                     </div>
                     <div className="flex flex-col sm:flex-row gap-3">

@@ -29,7 +29,8 @@ const DataExport = ({ isOpen, onClose, farms, crops, tasks, expenses }) => {
       'Planting Date': crop.plantingDate,
       'Status': crop.status,
       'Area (acres)': crop.area,
-      'Expected Harvest': crop.expectedHarvest || 'Not set',
+      'Expected Harvest Date': crop.expectedHarvestDate || 'Not set',
+      'Assigned Farm': crop.assignedFarm || 'Not assigned',
       'Harvest Date': crop.harvestDate || 'Not harvested',
       'Yield (lbs)': crop.yield || 'Not recorded'
     }))
