@@ -344,7 +344,6 @@ const KanbanView = ({ tasks, setTasks, addWeatherTask, onExport }) => {
                 </div>
               </div>
               
-              <Droppable droppableId={column.id}>
               <SortableContext items={getTasksByStatus(column.id).map(task => task.id)} strategy={verticalListSortingStrategy}>
                 <KanbanColumn
                   column={column}
@@ -355,9 +354,9 @@ const KanbanView = ({ tasks, setTasks, addWeatherTask, onExport }) => {
                   getDaysUntilDue={getDaysUntilDue}
                 />
               </SortableContext>
+            </div>
           ))}
         </div>
-      </DragDropContext>
       </DndContext>
       {/* Task Form Modal */}
       <AnimatePresence>
