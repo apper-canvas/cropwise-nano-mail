@@ -250,6 +250,14 @@ const CalendarView = ({ tasks, setTasks, addWeatherTask, onExport }) => {
             Weather Task
           </button>
           
+          <button
+            onClick={onExport}
+            className="flex items-center gap-2 bg-blue-500 hover:bg-blue-600 text-white px-3 py-2 rounded-lg transition-colors duration-300 text-sm"
+          >
+            <ApperIcon name="Download" className="h-4 w-4" />
+            Export Tasks
+          </button>
+          
           <div className="flex rounded-lg border border-surface-300 dark:border-surface-600 overflow-hidden">
             {['month', 'week', 'day'].map((viewType) => (
               <button
@@ -276,13 +284,6 @@ const CalendarView = ({ tasks, setTasks, addWeatherTask, onExport }) => {
             events={calendarEvents}
             startAccessor="start"
             endAccessor="end"
-          <button
-            onClick={onExport}
-            className="flex items-center gap-2 bg-secondary hover:bg-secondary-dark text-white px-4 py-2 rounded-xl transition-colors duration-300"
-          >
-            <ApperIcon name="Download" className="h-4 w-4" />
-            Export
-          </button>
             view={view}
             onView={setView}
             date={date}
