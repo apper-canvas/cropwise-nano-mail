@@ -44,10 +44,12 @@ const FarmMap = () => {
 
   const [cropForm, setCropForm] = useState({
     fieldId: '',
+    assignedFarm: '',
     cropType: '',
     variety: '',
     plantingDate: '',
-    expectedHarvest: '',
+    expectedHarvestDate: '',
+    notes: ''
     notes: ''
   })
 
@@ -171,8 +173,8 @@ const FarmMap = () => {
   }
 
   const handleCropSave = () => {
-    if (!cropForm.fieldId || !cropForm.cropType) {
-      toast.error('Please select a field and crop type')
+    if (!cropForm.fieldId || !cropForm.cropType || !cropForm.assignedFarm) {
+      toast.error('Please select a field, crop type, and assigned farm')
       return
     }
 
@@ -185,10 +187,12 @@ const FarmMap = () => {
     setShowCropModal(false)
     setCropForm({
       fieldId: '',
+      assignedFarm: '',
       cropType: '',
       variety: '',
       plantingDate: '',
-      expectedHarvest: '',
+      expectedHarvestDate: '',
+      notes: ''
       notes: ''
     })
     toast.success('Crop added successfully!')
@@ -363,7 +367,13 @@ const FarmMap = () => {
                       <div className="mt-1 space-y-1">
                         {getFieldCrops(selectedField.id).map(crop => (
                           <div key={crop.id} className="text-xs bg-emerald-50 text-emerald-700 px-2 py-1 rounded">
-                            {crop.cropType} - {crop.variety}
+                            <div className="font-medium">{crop.cropType} - {crop.variety}</div>
+                            {crop.expectedHarvestDate && (
+                              <div className="text-emerald-600">Expected Harvest: {new Date(crop.expectedHarvestDate).toLocaleDateString()}</div>
+                            )}
+                            {crop.assignedFarm && farms.find(f => f.id === parseInt(crop.assignedFarm)) && (
+                              <div className="text-emerald-600">Farm: {farms.find(f => f.id === parseInt(crop.assignedFarm)).name}</div>
+                            )}
                           </div>
                         ))}
                       </div>
@@ -591,6 +601,19 @@ const FarmMap = () => {
                 </select>
               </div>
               <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Assigned Farm</label>
+                <select
+                  value={cropForm.fieldId}
+                  onChange={(e) => setCropForm({...cropForm, fieldId: e.target.value})}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                >
+                  <option value="">Select a field</option>
+                  {fields.map(field => (
+                    <option key={field.id} value={field.id}>{field.name}</option>
+                  ))}
+                </select>
+              </div>
+              <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Crop Type</label>
                 <select
                   value={cropForm.cropType}
@@ -622,6 +645,25 @@ const FarmMap = () => {
                 />
               </div>
               <div className="flex space-x-3">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Expected Harvest Date</label>
+                <input
+                  type="date"
+                  value={cropForm.expectedHarvestDate}
+                  onChange={(e) => setCropForm({...cropForm, expectedHarvestDate: e.target.value})}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Notes</label>
+                <textarea
+                  value={cropForm.notes}
+                  onChange={(e) => setCropForm({...cropForm, notes: e.target.value})}
+                  rows="3"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                  placeholder="Additional notes about this crop..."
+                ></textarea>
+              </div>
                 <button
                   onClick={handleCropSave}
                   className="flex-1 bg-emerald-600 text-white px-4 py-2 rounded-lg hover:bg-emerald-700"
