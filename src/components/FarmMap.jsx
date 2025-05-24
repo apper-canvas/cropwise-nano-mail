@@ -193,7 +193,7 @@ const FarmMap = () => {
       plantingDate: '',
       expectedHarvestDate: '',
       notes: ''
-      notes: ''
+    })
     toast.success('Crop added successfully!')
   }
 
@@ -643,8 +643,6 @@ const FarmMap = () => {
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
                 />
               </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Expected Harvest Date</label>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Expected Harvest Date</label>
                 <input
