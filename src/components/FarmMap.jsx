@@ -578,24 +578,24 @@ const FarmMap = () => {
           <div className="bg-white rounded-xl w-full max-w-md max-h-[90vh] flex flex-col">
             {/* Modal Header */}
             <div className="flex-shrink-0 p-6 border-b border-gray-200">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-xl font-semibold text-gray-900">Add Crop</h2>
-              <button
-                onClick={() => setShowCropModal(false)}
-                className="p-2 hover:bg-gray-100 rounded-lg"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
+              <div className="flex items-center justify-between">
+                <h2 className="text-xl font-semibold text-gray-900">Add Crop</h2>
+                <button
+                  onClick={() => setShowCropModal(false)}
+                  className="p-2 hover:bg-gray-100 rounded-lg"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
             </div>
             
             {/* Modal Content - Scrollable */}
             <div className="flex-1 overflow-y-auto p-6">
-            <div className="space-y-4">
-              {/* Field Selection */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Field</label>
-                <select
+              <div className="space-y-4">
+                {/* Field Selection */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Field</label>
+                  <select
                   value={cropForm.fieldId}
                   onChange={(e) => setCropForm({...cropForm, fieldId: e.target.value})}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
@@ -605,11 +605,11 @@ const FarmMap = () => {
                     <option key={field.id} value={field.id}>{field.name}</option>
                   ))}
                 </select>
-              </div>
-              {/* Assigned Farm */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Assigned Farm</label>
-                <select
+                </div>
+                {/* Assigned Farm */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Assigned Farm</label>
+                  <select
                   value={cropForm.assignedFarm}
                   onChange={(e) => setCropForm({...cropForm, assignedFarm: e.target.value})}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
@@ -619,11 +619,11 @@ const FarmMap = () => {
                     <option key={farm.id} value={farm.id}>{farm.name}</option>
                   ))}
                 </select>
-              </div>
-              {/* Crop Type */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Crop Type</label>
-                <select
+                </div>
+                {/* Crop Type */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Crop Type</label>
+                  <select
                   value={cropForm.cropType}
                   onChange={(e) => setCropForm({...cropForm, cropType: e.target.value})}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
@@ -633,41 +633,41 @@ const FarmMap = () => {
                     <option key={crop} value={crop} className="capitalize">{crop}</option>
                   ))}
                 </select>
-              </div>
-              {/* Variety */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Variety</label>
-                <input
+                </div>
+                {/* Variety */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Variety</label>
+                  <input
                   type="text"
                   value={cropForm.variety}
                   onChange={(e) => setCropForm({...cropForm, variety: e.target.value})}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
                 />
-              </div>
-              {/* Planting Date */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Planting Date</label>
-                <input
+                </div>
+                {/* Planting Date */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Planting Date</label>
+                  <input
                   type="date"
                   value={cropForm.plantingDate}
                   onChange={(e) => setCropForm({...cropForm, plantingDate: e.target.value})}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
                 />
-              </div>
-              {/* Expected Harvest Date */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Expected Harvest Date</label>
-                <input
+                </div>
+                {/* Expected Harvest Date */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Expected Harvest Date</label>
+                  <input
                   type="date"
                   value={cropForm.expectedHarvestDate}
                   onChange={(e) => setCropForm({...cropForm, expectedHarvestDate: e.target.value})}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
                 />
-              </div>
-              {/* Notes */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Notes</label>
-                <textarea
+                </div>
+                {/* Notes */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Notes</label>
+                  <textarea
                   value={cropForm.notes}
                   onChange={(e) => setCropForm({...cropForm, notes: e.target.value})}
                   rows="3"
@@ -675,7 +675,7 @@ const FarmMap = () => {
                   placeholder="Additional notes about this crop..."
                 ></textarea>
               </div>
-            </div>
+              </div>
             </div>
             
             {/* Modal Footer */}
@@ -695,8 +695,8 @@ const FarmMap = () => {
                 </button>
               </div>
             </div>
-            </div>
           </div>
+        </div>
         </div>
       )}
 
