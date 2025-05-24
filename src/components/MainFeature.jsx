@@ -831,8 +831,7 @@ const MainFeature = () => {
               </div>
             </motion.div>
           )}
-        </AnimatePresence>
-        
+
         {/* Expense Report Tab */}
         {activeTab === 'expense-report' && (
           <motion.div
@@ -845,6 +844,7 @@ const MainFeature = () => {
             <ExpenseReport expenses={expenses} onExport={() => setShowExportModal(true)} />
           </motion.div>
         )}
+        </AnimatePresence>
       </AnimatePresence>
       </div>
       </div>
