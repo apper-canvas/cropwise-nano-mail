@@ -21,7 +21,8 @@
     "@reduxjs/toolkit": "2.7.0",
     "axios": "^1.6.0",
     "react-big-calendar": "^1.8.2",
-    "moment": "^2.29.4"
+    "moment": "^2.29.4",
+    "xlsx": "^0.18.5"
   },
   "devDependencies": {
     "@types/react": "^18.2.15",

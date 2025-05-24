@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { toast } from 'react-toastify'
 import ApperIcon from './ApperIcon'
 import CalendarView from './CalendarView'
+import DataExport from './DataExport'
 
 const MainFeature = () => {
   const [activeTab, setActiveTab] = useState('crops')
@@ -23,6 +24,7 @@ const MainFeature = () => {
   const [showTaskForm, setShowTaskForm] = useState(false)
   const [showExpenseForm, setShowExpenseForm] = useState(false)
 
+  const [showExportModal, setShowExportModal] = useState(false)
   const [newCrop, setNewCrop] = useState({
     name: '',
     variety: '',
@@ -186,13 +188,22 @@ const MainFeature = () => {
                 <h2 className="text-xl sm:text-2xl font-bold text-surface-900 dark:text-surface-100">
                   Crop Management
                 </h2>
-                <button
-                  onClick={() => setShowCropForm(!showCropForm)}
-                  className="flex items-center gap-2 bg-primary hover:bg-primary-dark text-white px-4 py-2 rounded-xl transition-colors duration-300 w-fit"
-                >
-                  <ApperIcon name="Plus" className="h-4 w-4" />
-                  Add Crop
-                </button>
+                <div className="flex gap-3">
+                  <button
+                    onClick={() => setShowExportModal(true)}
+                    className="flex items-center gap-2 bg-secondary hover:bg-secondary-dark text-white px-4 py-2 rounded-xl transition-colors duration-300 w-fit"
+                  >
+                    <ApperIcon name="Download" className="h-4 w-4" />
+                    Export
+                  </button>
+                  <button
+                    onClick={() => setShowCropForm(!showCropForm)}
+                    className="flex items-center gap-2 bg-primary hover:bg-primary-dark text-white px-4 py-2 rounded-xl transition-colors duration-300 w-fit"
+                  >
+                    <ApperIcon name="Plus" className="h-4 w-4" />
+                    Add Crop
+                  </button>
+                </div>
               </div>
 
               {/* Add Crop Form */}
@@ -321,6 +332,7 @@ const MainFeature = () => {
                 tasks={tasks} 
                 setTasks={setTasks} 
                 addWeatherTask={addWeatherTask} 
+                onExport={() => setShowExportModal(true)}
               />
             </motion.div>
           )}
@@ -342,13 +354,22 @@ const MainFeature = () => {
                     Total: ${expenses.reduce((sum, expense) => sum + expense.amount, 0).toFixed(2)}
                   </p>
                 </div>
-                <button
-                  onClick={() => setShowExpenseForm(!showExpenseForm)}
-                  className="flex items-center gap-2 bg-primary hover:bg-primary-dark text-white px-4 py-2 rounded-xl transition-colors duration-300 w-fit"
-                >
-                  <ApperIcon name="Plus" className="h-4 w-4" />
-                  Add Expense
-                </button>
+                <div className="flex gap-3">
+                  <button
+                    onClick={() => setShowExportModal(true)}
+                    className="flex items-center gap-2 bg-secondary hover:bg-secondary-dark text-white px-4 py-2 rounded-xl transition-colors duration-300 w-fit"
+                  >
+                    <ApperIcon name="Download" className="h-4 w-4" />
+                    Export
+                  </button>
+                  <button
+                    onClick={() => setShowExpenseForm(!showExpenseForm)}
+                    className="flex items-center gap-2 bg-primary hover:bg-primary-dark text-white px-4 py-2 rounded-xl transition-colors duration-300 w-fit"
+                  >
+                    <ApperIcon name="Plus" className="h-4 w-4" />
+                    Add Expense
+                  </button>
+                </div>
               </div>
 
               {/* Add Expense Form */}
@@ -474,6 +495,15 @@ const MainFeature = () => {
           )}
         </AnimatePresence>
       </div>
+      
+      {/* Export Modal */}
+      <DataExport
+        isOpen={showExportModal}
+        onClose={() => setShowExportModal(false)}
+        crops={crops}
+        tasks={tasks}
+        expenses={expenses}
+      />
     </div>
   )
 }

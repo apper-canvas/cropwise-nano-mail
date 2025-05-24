@@ -8,7 +8,7 @@ import 'react-big-calendar/lib/css/react-big-calendar.css'
 
 const localizer = momentLocalizer(moment)
 
-const CalendarView = ({ tasks, setTasks, addWeatherTask }) => {
+const CalendarView = ({ tasks, setTasks, addWeatherTask, onExport }) => {
   const [view, setView] = useState('month')
   const [date, setDate] = useState(new Date())
   const [showEventModal, setShowEventModal] = useState(false)
@@ -276,6 +276,13 @@ const CalendarView = ({ tasks, setTasks, addWeatherTask }) => {
             events={calendarEvents}
             startAccessor="start"
             endAccessor="end"
+          <button
+            onClick={onExport}
+            className="flex items-center gap-2 bg-secondary hover:bg-secondary-dark text-white px-4 py-2 rounded-xl transition-colors duration-300"
+          >
+            <ApperIcon name="Download" className="h-4 w-4" />
+            Export
+          </button>
             view={view}
             onView={setView}
             date={date}
