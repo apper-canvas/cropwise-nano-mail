@@ -29,7 +29,9 @@ const KanbanView = ({ tasks, setTasks, addWeatherTask, onExport }) => {
     dueDate: '',
     status: 'todo',
     assignee: '',
-    location: 'North Field'
+    location: 'North Field',
+    taskType: 'watering',
+    assignedCropFarm: ''
   })
 
   const statusColumns = [
@@ -61,7 +63,9 @@ const KanbanView = ({ tasks, setTasks, addWeatherTask, onExport }) => {
       ...task,
       status: task.status || 'todo',
       assignee: task.assignee || '',
-      location: task.location || 'North Field'
+      location: task.location || 'North Field',
+      taskType: task.taskType || 'watering',
+      assignedCropFarm: task.assignedCropFarm || ''
     }))
 
     // Priority filter
@@ -189,7 +193,9 @@ const KanbanView = ({ tasks, setTasks, addWeatherTask, onExport }) => {
       dueDate: '',
       status: 'todo',
       assignee: '',
-      location: 'North Field'
+      location: 'North Field',
+      taskType: 'watering',
+      assignedCropFarm: ''
     })
     setShowTaskForm(false)
   }
@@ -203,7 +209,9 @@ const KanbanView = ({ tasks, setTasks, addWeatherTask, onExport }) => {
       dueDate: task.dueDate,
       status: task.status || 'todo',
       assignee: task.assignee || '',
-      location: task.location || 'North Field'
+      location: task.location || 'North Field',
+      taskType: task.taskType || 'watering',
+      assignedCropFarm: task.assignedCropFarm || ''
     })
     setShowTaskForm(true)
   }
@@ -225,7 +233,9 @@ const KanbanView = ({ tasks, setTasks, addWeatherTask, onExport }) => {
       dueDate: '',
       status: 'todo',
       assignee: '',
-      location: 'North Field'
+      location: 'North Field',
+      taskType: 'watering',
+      assignedCropFarm: ''
     })
   }
 
@@ -389,6 +399,55 @@ const KanbanView = ({ tasks, setTasks, addWeatherTask, onExport }) => {
                 </div>
 
                 <form onSubmit={handleSubmitTask} className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-2">
+                      Task Type
+                    </label>
+                    <select
+                      value={newTask.taskType}
+                      onChange={(e) => setNewTask({...newTask, taskType: e.target.value})}
+                      className="w-full px-3 py-2 border border-surface-300 dark:border-surface-600 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent dark:bg-surface-700 dark:text-surface-100"
+                    >
+                      <option value="watering">Watering</option>
+                      <option value="fertilizing">Fertilizing</option>
+                      <option value="weeding">Weeding</option>
+                      <option value="harvesting">Harvesting</option>
+                      <option value="planting">Planting</option>
+                      <option value="pest_control">Pest Control</option>
+                      <option value="maintenance">Maintenance</option>
+                      <option value="inspection">Inspection</option>
+                      <option value="irrigation">Irrigation</option>
+                      <option value="pruning">Pruning</option>
+                      <option value="soil_testing">Soil Testing</option>
+                      <option value="equipment_maintenance">Equipment Maintenance</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-2">
+                      Assigned Crop/Farm
+                    </label>
+                    <select
+                      value={newTask.assignedCropFarm}
+                      onChange={(e) => setNewTask({...newTask, assignedCropFarm: e.target.value})}
+                      className="w-full px-3 py-2 border border-surface-300 dark:border-surface-600 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent dark:bg-surface-700 dark:text-surface-100"
+                    >
+                      <option value="">Select Crop/Farm</option>
+                      <optgroup label="Farm Locations">
+                        {farmLocations.map(location => (
+                          <option key={`farm-${location}`} value={`Farm: ${location}`}>
+                            Farm: {location}
+                          </option>
+                        ))}
+                      </optgroup>
+                      <optgroup label="General Areas">
+                        <option value="All Farms">All Farms</option>
+                        <option value="Main Field">Main Field</option>
+                        <option value="Secondary Field">Secondary Field</option>
+                      </optgroup>
+                    </select>
+                  </div>
+
                   <div>
                     <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-2">
                       Task Title *
@@ -626,6 +685,21 @@ const SortableTaskCard = ({ task, onEditTask, onDeleteTask, getPriorityColor, ge
       </div>
       
       <div className="flex items-center justify-between text-xs text-surface-500 dark:text-surface-400">
+        <div className="flex items-center gap-1">
+          <ApperIcon name="Droplets" className="h-3 w-3" />
+          <span className="capitalize">{task.taskType?.replace('_', ' ') || 'General'}</span>
+        </div>
+        {task.assignedCropFarm && (
+          <div className="flex items-center gap-1">
+            <ApperIcon name="Target" className="h-3 w-3" />
+            <span className="truncate max-w-20" title={task.assignedCropFarm}>
+              {task.assignedCropFarm}
+            </span>
+          </div>
+        )}
+      </div>
+      
+      <div className="flex items-center justify-between text-xs text-surface-500 dark:text-surface-400 mt-1">
         <div className="flex items-center gap-1">
           <ApperIcon name="MapPin" className="h-3 w-3" />
           {task.location || 'North Field'}
