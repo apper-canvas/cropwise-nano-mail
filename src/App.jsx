@@ -10,13 +10,13 @@ import ErrorPage from './pages/ErrorPage'
 import Home from './pages/Home'
 import NotFound from './pages/NotFound'
 import Farm from './components/Farm'
+import CalendarView from './components/CalendarView'
 import CropHistory from './components/CropHistory'
+import DataExport from './components/DataExport'
 import ExpenseReport from './components/ExpenseReport'
 import FarmMap from './components/FarmMap'
-import CalendarView from './components/CalendarView'
-import KanbanView from './components/KanbanView'
-import DataExport from './components/DataExport'
 import Inventory from './components/Inventory'
+import KanbanView from './components/KanbanView'
 import 'react-toastify/dist/ReactToastify.css'
 
 // Create auth context
@@ -51,11 +51,11 @@ function App() {
       view: 'both',
       onSuccess: function (user) {
         setIsInitialized(true)
-        
-        const currentPath = window.location.pathname
-        const redirectPath = new URLSearchParams(window.location.search).get('redirect')
+const currentPath = window.location.pathname
+        const redirectPath = window.URLSearchParams && window.location.search 
+          ? new URLSearchParams(window.location.search).get('redirect') 
+          : null
         const isAuthPage = ['login', 'signup', 'callback', 'error'].some(path => currentPath.includes(path))
-        
         if (user) {
           // User is authenticated
           if (redirectPath) {
@@ -126,9 +126,9 @@ function App() {
           <Route path="/callback" element={<Callback />} />
           <Route path="/error" element={<ErrorPage />} />
           <Route path="/" element={<Home />} />
-          <Route path="/farms" element={<Farm />} />
+<Route path="/farms" element={<Farm />} />
           <Route path="/farm-map" element={<FarmMap />} />
-<Route path="/crop-history" element={<CropHistory />} />
+          <Route path="/crop-history" element={<CropHistory />} />
           <Route path="/crop-history/:farmId" element={<CropHistory />} />
           <Route path="/expense-report" element={<ExpenseReport />} />
           <Route path="/calendar" element={<CalendarView />} />
@@ -138,6 +138,7 @@ function App() {
           <Route path="/inventory" element={<Inventory />} />
           <Route path="/data-export" element={<DataExport />} />
           <Route path="*" element={<NotFound />} />
+        </Routes>
         
         <ToastContainer
           position="top-right"
