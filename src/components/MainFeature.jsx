@@ -305,9 +305,10 @@ return (
             >
               <ApperIcon name={tab.icon} className="h-4 w-4 sm:h-5 sm:w-5" />
               {tab.label}
-            </button>
+</button>
           ))}
         </div>
+      </div>
 
       {/* Tab Content */}
       <div className="p-4 sm:p-6 lg:p-8">
@@ -325,7 +326,7 @@ return (
                 <h2 className="text-xl sm:text-2xl font-bold text-surface-900 dark:text-surface-100">
                   Farm Management
                 </h2>
-                <div className="flex gap-3">
+<div className="flex gap-3">
                   <button
                     onClick={() => setShowExportModal(true)}
                     className="flex items-center gap-2 bg-secondary hover:bg-secondary-dark text-white px-4 py-2 rounded-xl transition-colors duration-300 w-fit"
@@ -340,7 +341,10 @@ return (
                     <ApperIcon name="Plus" className="h-4 w-4" />
                     Add Farm
                   </button>
-{/* Add Farm Form */}
+                </div>
+              </div>
+
+              {/* Add Farm Form */}
               <AnimatePresence>
                 {showFarmForm && (
                   <motion.form
