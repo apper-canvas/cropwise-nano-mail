@@ -147,13 +147,13 @@ const CropHistory = () => {
       status: 'Harvested',
       notes: 'Premium quality, direct market sales',
       pestIssues: 'Slugs in wet areas',
-      fertilizerUsed: 'Organic fish emulsion',
-      irrigationMethod: 'Drip irrigation',
-weatherConditions: 'Cool fall weather, perfect for lettuce'
-    }
-  ];
+fertilizerUsed: 'Organic fish emulsion',
+        irrigationMethod: 'Drip irrigation',
+        soilCondition: 'Good',
+        weatherConditions: 'Cool fall weather, perfect for lettuce'
+      }
+    ];
   }
-
   const [filteredHistory, setFilteredHistory] = useState(cropHistory)
   const [searchTerm, setSearchTerm] = useState('')
   const [selectedFarm, setSelectedFarm] = useState(farmId ? parseInt(farmId) : 'all')
@@ -351,66 +351,18 @@ weatherConditions: 'Cool fall weather, perfect for lettuce'
     setShowAddForm(true)
   }
 
-  const handleDeleteCrop = (cropId) => {
-    if (window.confirm('Are you sure you want to delete this crop history record? This action cannot be undone.')) {
-      setCropHistory(prev => prev.filter(crop => crop.id !== cropId))
-      toast.success('Crop history deleted successfully!')
-    }
-  }
-
-  const calculateStats = () => {
-    const totalArea = filteredHistory.reduce((sum, crop) => sum + crop.area, 0)
-    const totalYield = filteredHistory.reduce((sum, crop) => sum + crop.yieldAmount, 0)
-    const successfulHarvests = filteredHistory.filter(crop => crop.status === 'Harvested').length
-    const successRate = filteredHistory.length > 0 ? (successfulHarvests / filteredHistory.length * 100).toFixed(1) : 0
-
-    return { totalArea, totalYield, successfulHarvests, successRate }
-  }
-
-  const stats = calculateStats()
-  const currentFarm = farmId ? farms.find(f => f.id === parseInt(farmId)) : null
-
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-green-50 to-teal-50 dark:from-surface-900 dark:via-surface-800 dark:to-surface-900">
-      {/* Header */}
-      <header className="bg-white/80 dark:bg-surface-800/80 backdrop-blur-sm shadow-sm">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <Link
-                to={farmId ? "/farms" : "/"}
-                className="flex items-center gap-2 text-surface-600 hover:text-primary transition-colors duration-300"
-              >
-                <ApperIcon name="ArrowLeft" className="h-5 w-5" />
-                {farmId ? 'Back to Farms' : 'Back to Dashboard'}
-              </Link>
-            </div>
-            <h1 className="text-2xl font-bold text-surface-900 dark:text-surface-100">
-              {currentFarm ? `${currentFarm.name} - Crop History` : 'Crop History'}
-            </h1>
-            <div className="w-32"></div>
-          </div>
-        </div>
-      </header>
-
-      {/* Stats Summary */}
-      <section className="container mx-auto px-4 sm:px-6 lg:px-8 py-6">
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
 const handleDeleteCrop = async (cropId) => {
     if (window.confirm('Are you sure you want to delete this crop history record? This action cannot be undone.')) {
       try {
-        const deleted = await cropHistoryService.delete(cropId)
-        if (deleted) {
-          await loadCropHistory()
-          toast.success('Crop history deleted successfully!')
-        }
+        await cropHistoryService.delete(cropId)
+        await loadCropHistory()
+        toast.success('Crop history deleted successfully!')
       } catch (error) {
         console.error('Error deleting crop history:', error)
         toast.error('Failed to delete crop history')
       }
     }
   }
-
   const calculateStats = () => {
     const totalArea = filteredHistory.reduce((sum, crop) => sum + crop.area, 0)
     const totalYield = filteredHistory.reduce((sum, crop) => sum + crop.yieldAmount, 0)
@@ -473,7 +425,7 @@ const handleDeleteCrop = async (cropId) => {
           >
             <div className="flex items-center gap-3 mb-2">
               <div className="p-2 rounded-xl bg-secondary/10">
-                <ApperIcon name="TrendingUp" className="h-5 w-5 text-secondary" />
+<ApperIcon name="TrendingUp" className="h-5 w-5 text-secondary" />
               </div>
               <span className="text-sm text-surface-600 dark:text-surface-400">Total Yield</span>
             </div>
