@@ -13,6 +13,10 @@ import Farm from './components/Farm'
 import CropHistory from './components/CropHistory'
 import ExpenseReport from './components/ExpenseReport'
 import FarmMap from './components/FarmMap'
+import CalendarView from './components/CalendarView'
+import KanbanView from './components/KanbanView'
+import DataExport from './components/DataExport'
+import Inventory from './components/Inventory'
 import 'react-toastify/dist/ReactToastify.css'
 
 // Create auth context
@@ -27,9 +31,14 @@ function App() {
   const userState = useSelector((state) => state.user)
   const isAuthenticated = userState?.isAuthenticated || false
 
-  // Initialize ApperUI once when the app loads
+// Initialize ApperUI once when the app loads
   useEffect(() => {
     const { ApperClient, ApperUI } = window.ApperSDK
+    
+    if (!ApperClient || !ApperUI) {
+      console.error('ApperSDK not loaded');
+      return;
+    }
 
     const client = new ApperClient({
       apperProjectId: import.meta.env.VITE_APPER_PROJECT_ID,
@@ -42,10 +51,10 @@ function App() {
       view: 'both',
       onSuccess: function (user) {
         setIsInitialized(true)
-        // CRITICAL: This exact currentPath logic must be preserved
-        let currentPath = window.location.pathname + window.location.search
-        let redirectPath = new URLSearchParams(window.location.search).get('redirect')
-        const isAuthPage = currentPath.includes('/login') || currentPath.includes('/signup') || currentPath.includes('/callback') || currentPath.includes('/error')
+        
+        const currentPath = window.location.pathname
+        const redirectPath = new URLSearchParams(window.location.search).get('redirect')
+        const isAuthPage = ['login', 'signup', 'callback', 'error'].some(path => currentPath.includes(path))
         
         if (user) {
           // User is authenticated
@@ -84,9 +93,6 @@ function App() {
           }
           dispatch(clearUser())
         }
-      },
-      onError: function(error) {
-        console.error("Authentication failed:", error)
       }
     })
   }, [navigate, dispatch])
@@ -122,11 +128,16 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route path="/farms" element={<Farm />} />
           <Route path="/farm-map" element={<FarmMap />} />
-          <Route path="/crop-history" element={<CropHistory />} />
+<Route path="/crop-history" element={<CropHistory />} />
           <Route path="/crop-history/:farmId" element={<CropHistory />} />
           <Route path="/expense-report" element={<ExpenseReport />} />
+          <Route path="/calendar" element={<CalendarView />} />
+          <Route path="/kanban" element={<KanbanView />} />
+          <Route path="/reports" element={<ExpenseReport />} />
+          <Route path="/history" element={<CropHistory />} />
+          <Route path="/inventory" element={<Inventory />} />
+          <Route path="/data-export" element={<DataExport />} />
           <Route path="*" element={<NotFound />} />
-        </Routes>
         
         <ToastContainer
           position="top-right"
