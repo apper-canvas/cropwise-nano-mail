@@ -11,9 +11,12 @@ import { arrayMove, SortableContext, sortableKeyboardCoordinates, verticalListSo
 import { motion, AnimatePresence } from 'framer-motion'
 import { toast } from 'react-toastify'
 import ApperIcon from './ApperIcon'
-
-const KanbanView = ({ tasks, setTasks, addWeatherTask, onExport }) => {
-  const [filteredTasks, setFilteredTasks] = useState(tasks)
+import taskService from '../services/api/taskService'
+const KanbanView = ({ addWeatherTask, onExport }) => {
+  const [tasks, setTasks] = useState([])
+  const [filteredTasks, setFilteredTasks] = useState([])
+  const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState(null)
   const [filters, setFilters] = useState({
     priority: 'all',
     search: '',
@@ -33,7 +36,6 @@ const KanbanView = ({ tasks, setTasks, addWeatherTask, onExport }) => {
     taskType: 'watering',
     assignedCropFarm: ''
   })
-
   const statusColumns = [
     { id: 'todo', title: 'To Do', color: 'bg-gray-100 dark:bg-gray-800', headerColor: 'bg-gray-500' },
     { id: 'inprogress', title: 'In Progress', color: 'bg-blue-100 dark:bg-blue-900', headerColor: 'bg-blue-500' },
@@ -51,10 +53,41 @@ const KanbanView = ({ tasks, setTasks, addWeatherTask, onExport }) => {
     })
   )
 
+useEffect(() => {
+    loadTasks()
+  }, [])
+
   useEffect(() => {
     applyFilters()
   }, [tasks, filters])
 
+  const loadTasks = async () => {
+    setIsLoading(true)
+    setError(null)
+    try {
+      const tasksData = await taskService.getAll()
+      // Transform API data to match component expectations
+      const transformedTasks = tasksData.map(task => ({
+        id: task.id,
+        title: task.title,
+        description: task.description,
+        priority: task.priority,
+        dueDate: task.dueDate,
+        status: task.completed ? 'done' : 'todo',
+        assignee: task.assignedTo,
+        location: task.location,
+        completed: task.completed,
+        taskType: 'watering', // Default value since not in database
+        assignedCropFarm: '' // Default value since not in database
+      }))
+      setTasks(transformedTasks)
+    } catch (err) {
+      setError(err.message)
+      console.error('Error loading tasks:', err)
+    } finally {
+      setIsLoading(false)
+    }
+  }
   const applyFilters = () => {
     let filtered = [...tasks]
 
@@ -113,7 +146,7 @@ const KanbanView = ({ tasks, setTasks, addWeatherTask, onExport }) => {
     setFilteredTasks(filtered)
   }
 
-  const handleDragEnd = (event) => {
+const handleDragEnd = async (event) => {
     const { active, over } = event
 
     if (!over) return
@@ -129,14 +162,38 @@ const KanbanView = ({ tasks, setTasks, addWeatherTask, onExport }) => {
     const currentTask = tasks.find(task => task.id === taskId)
     if (currentTask && currentTask.status === finalStatus) return
     
+    // Optimistically update UI
     const updatedTasks = tasks.map(task => 
       task.id === taskId 
         ? { ...task, status: finalStatus, completed: finalStatus === 'done' }
         : task
     )
-
     setTasks(updatedTasks)
-    toast.success(`Task moved to ${statusColumns.find(col => col.id === newStatus)?.title}`)
+    
+    try {
+      // Update in database
+      const taskToUpdate = currentTask
+      const updateData = {
+        title: taskToUpdate.title,
+        description: taskToUpdate.description,
+        priority: taskToUpdate.priority,
+        dueDate: taskToUpdate.dueDate,
+        completed: finalStatus === 'done',
+        completionDate: finalStatus === 'done' ? new Date().toISOString().split('T')[0] : null,
+        location: taskToUpdate.location,
+        assignedTo: taskToUpdate.assignee,
+        tags: taskToUpdate.tags || '',
+        owner: taskToUpdate.owner
+      }
+      
+      await taskService.update(taskId, updateData)
+      toast.success(`Task moved to ${statusColumns.find(col => col.id === finalStatus)?.title}`)
+    } catch (error) {
+      // Revert optimistic update on error
+      setTasks(tasks)
+      toast.error('Failed to update task status')
+      console.error('Error updating task status:', error)
+    }
   }
 
   const getTasksByStatus = (status) => {
@@ -160,44 +217,60 @@ const KanbanView = ({ tasks, setTasks, addWeatherTask, onExport }) => {
     return diffDays
   }
 
-  const handleSubmitTask = (e) => {
+const handleSubmitTask = async (e) => {
     e.preventDefault()
     if (!newTask.title || !newTask.dueDate) {
       toast.error('Please fill in required fields')
       return
     }
 
-    if (editingTask) {
-      const updatedTasks = tasks.map(task =>
-        task.id === editingTask.id
-          ? { ...task, ...newTask }
-          : task
-      )
-      setTasks(updatedTasks)
-      toast.success('Task updated successfully!')
-      setEditingTask(null)
-    } else {
-      const task = {
-        id: Date.now(),
-        ...newTask,
-        completed: newTask.status === 'done'
+    setIsLoading(true)
+    try {
+      const taskData = {
+        title: newTask.title,
+        description: newTask.description,
+        priority: newTask.priority,
+        dueDate: newTask.dueDate,
+        completed: newTask.status === 'done',
+        completionDate: newTask.status === 'done' ? new Date().toISOString().split('T')[0] : null,
+        location: newTask.location,
+        assignedTo: newTask.assignee,
+        tags: '',
+        owner: null
       }
-      setTasks([...tasks, task])
-      toast.success('Task created successfully!')
-    }
 
-    setNewTask({
-      title: '',
-      description: '',
-      priority: 'Medium',
-      dueDate: '',
-      status: 'todo',
-      assignee: '',
-      location: 'North Field',
-      taskType: 'watering',
-      assignedCropFarm: ''
-    })
-    setShowTaskForm(false)
+      if (editingTask) {
+        const updatedTask = await taskService.update(editingTask.id, taskData)
+        if (updatedTask) {
+          // Refresh tasks to get updated data
+          await loadTasks()
+          setEditingTask(null)
+        }
+      } else {
+        const createdTask = await taskService.create(taskData)
+        if (createdTask) {
+          // Refresh tasks to get new data
+          await loadTasks()
+        }
+      }
+
+      setNewTask({
+        title: '',
+        description: '',
+        priority: 'Medium',
+        dueDate: '',
+        status: 'todo',
+        assignee: '',
+        location: 'North Field',
+        taskType: 'watering',
+        assignedCropFarm: ''
+      })
+      setShowTaskForm(false)
+    } catch (error) {
+      console.error('Error submitting task:', error)
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   const handleEditTask = (task) => {
@@ -216,10 +289,20 @@ const KanbanView = ({ tasks, setTasks, addWeatherTask, onExport }) => {
     setShowTaskForm(true)
   }
 
-  const handleDeleteTask = (taskId) => {
+const handleDeleteTask = async (taskId) => {
     if (window.confirm('Are you sure you want to delete this task?')) {
-      setTasks(tasks.filter(task => task.id !== taskId))
-      toast.success('Task deleted successfully!')
+      setIsLoading(true)
+      try {
+        const success = await taskService.delete(taskId)
+        if (success) {
+          // Remove task from local state
+          setTasks(tasks.filter(task => task.id !== taskId))
+        }
+      } catch (error) {
+        console.error('Error deleting task:', error)
+      } finally {
+        setIsLoading(false)
+      }
     }
   }
 
@@ -237,10 +320,31 @@ const KanbanView = ({ tasks, setTasks, addWeatherTask, onExport }) => {
       taskType: 'watering',
       assignedCropFarm: ''
     })
+})
   }
 
   return (
     <div className="space-y-6">
+      {/* Loading State */}
+        <div className="flex items-center justify-center py-8">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+          <span className="ml-2 text-surface-600 dark:text-surface-400">Loading tasks...</span>
+        </div>
+      )}
+
+      {/* Error State */}
+      {error && (
+        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
+          Error loading tasks: {error}
+          <button 
+            onClick={loadTasks}
+            className="ml-2 underline hover:no-underline"
+          >
+            Try again
+          </button>
+        </div>
+      )}
+
       {/* Header */}
       <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
         <h2 className="text-2xl font-bold text-surface-900 dark:text-surface-100">
@@ -248,14 +352,14 @@ const KanbanView = ({ tasks, setTasks, addWeatherTask, onExport }) => {
         </h2>
         
         <div className="flex flex-wrap gap-2">
-          <button
+<button
             onClick={() => setShowTaskForm(true)}
-            className="flex items-center gap-2 bg-primary hover:bg-primary-dark text-white px-4 py-2 rounded-lg transition-colors duration-300"
+            disabled={isLoading}
+            className="flex items-center gap-2 bg-primary hover:bg-primary-dark text-white px-4 py-2 rounded-lg transition-colors duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <ApperIcon name="Plus" className="h-4 w-4" />
             Add Task
           </button>
-          
           <button
             onClick={addWeatherTask}
             className="flex items-center gap-2 bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg transition-colors duration-300"
@@ -552,11 +656,12 @@ const KanbanView = ({ tasks, setTasks, addWeatherTask, onExport }) => {
                   </div>
 
                   <div className="flex gap-3 pt-4">
-                    <button
+<button
                       type="submit"
-                      className="flex-1 bg-primary hover:bg-primary-dark text-white px-4 py-2 rounded-lg transition-colors duration-300"
+                      disabled={isLoading}
+                      className="flex-1 bg-primary hover:bg-primary-dark text-white px-4 py-2 rounded-lg transition-colors duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                      {editingTask ? 'Update Task' : 'Create Task'}
+                      {isLoading ? 'Saving...' : (editingTask ? 'Update Task' : 'Create Task')}
                     </button>
                     <button
                       type="button"
@@ -572,16 +677,13 @@ const KanbanView = ({ tasks, setTasks, addWeatherTask, onExport }) => {
           </motion.div>
         )}
       </AnimatePresence>
-    </div>
+</div>
   )
 }
 
 // Separate component for Kanban column to handle droppable area
-import { useDroppable } from '@dnd-kit/core'
-import { useSortable } from '@dnd-kit/sortable'
-import { CSS } from '@dnd-kit/utilities'
-
 const KanbanColumn = ({ column, tasks, onEditTask, onDeleteTask, getPriorityColor, getDaysUntilDue }) => {
+  const { useDroppable } = require('@dnd-kit/core')
   const { setNodeRef, isOver } = useDroppable({
     id: column.id,
   })
@@ -608,6 +710,9 @@ const KanbanColumn = ({ column, tasks, onEditTask, onDeleteTask, getPriorityColo
 }
 
 const SortableTaskCard = ({ task, onEditTask, onDeleteTask, getPriorityColor, getDaysUntilDue }) => {
+  const { useSortable } = require('@dnd-kit/sortable')
+  const { CSS } = require('@dnd-kit/utilities')
+  
   const {
     attributes,
     listeners,
