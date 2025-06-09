@@ -5,9 +5,11 @@ import {
   KeyboardSensor,
   PointerSensor,
   useSensor,
-  useSensors,
+useSensors,
+  useDroppable
 } from '@dnd-kit/core'
-import { arrayMove, SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy } from '@dnd-kit/sortable'
+import { arrayMove, SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy, useSortable } from '@dnd-kit/sortable'
+import { CSS } from '@dnd-kit/utilities'
 import { motion, AnimatePresence } from 'framer-motion'
 import { toast } from 'react-toastify'
 import ApperIcon from './ApperIcon'
@@ -317,21 +319,20 @@ const handleDeleteTask = async (taskId) => {
       status: 'todo',
       assignee: '',
       location: 'North Field',
-      taskType: 'watering',
+taskType: 'watering',
       assignedCropFarm: ''
     })
-})
   }
 
   return (
     <div className="space-y-6">
       {/* Loading State */}
+      {isLoading && (
         <div className="flex items-center justify-center py-8">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
           <span className="ml-2 text-surface-600 dark:text-surface-400">Loading tasks...</span>
         </div>
       )}
-
       {/* Error State */}
       {error && (
         <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
@@ -683,11 +684,9 @@ const handleDeleteTask = async (taskId) => {
 
 // Separate component for Kanban column to handle droppable area
 const KanbanColumn = ({ column, tasks, onEditTask, onDeleteTask, getPriorityColor, getDaysUntilDue }) => {
-  const { useDroppable } = require('@dnd-kit/core')
   const { setNodeRef, isOver } = useDroppable({
     id: column.id,
   })
-
   return (
     <div
       ref={setNodeRef}
@@ -708,11 +707,7 @@ const KanbanColumn = ({ column, tasks, onEditTask, onDeleteTask, getPriorityColo
     </div>
   )
 }
-
 const SortableTaskCard = ({ task, onEditTask, onDeleteTask, getPriorityColor, getDaysUntilDue }) => {
-  const { useSortable } = require('@dnd-kit/sortable')
-  const { CSS } = require('@dnd-kit/utilities')
-  
   const {
     attributes,
     listeners,
