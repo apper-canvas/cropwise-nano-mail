@@ -4,30 +4,57 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { toast } from 'react-toastify'
 import ApperIcon from './ApperIcon'
 import DataExport from './DataExport'
+import farmService from '../services/api/farmService'
+import cropHistoryService from '../services/api/cropHistoryService'
 
 const CropHistory = () => {
   const { farmId } = useParams()
-  const [farms] = useState([
-    { 
-      id: 1, 
-      name: 'North Field Farm', 
-      location: 'North Valley, CA', 
-      size: 50.5, 
-      type: 'Vegetable'
-    },
-    { 
-      id: 2, 
-      name: 'Sunny Acres', 
-      location: 'Central Valley, CA', 
-      size: 75.2, 
-      type: 'Grain'
-    }
-  ])
+  const [farms, setFarms] = useState([])
+  const [cropHistory, setCropHistory] = useState([])
+  const [loading, setLoading] = useState({
+    farms: false,
+    cropHistory: false
+  })
+  const [error, setError] = useState(null)
 
-  const [cropHistory, setCropHistory] = useState([
-    {
-      id: 1,
-      farmId: 1,
+  // Load data on component mount
+  useEffect(() => {
+    loadFarms()
+    loadCropHistory()
+  }, [])
+
+  const loadFarms = async () => {
+    setLoading(prev => ({ ...prev, farms: true }))
+    try {
+      const farmData = await farmService.getAll()
+      setFarms(farmData || [])
+    } catch (error) {
+      console.error('Error loading farms:', error)
+      setError('Failed to load farms')
+    } finally {
+      setLoading(prev => ({ ...prev, farms: false }))
+    }
+  }
+
+  const loadCropHistory = async () => {
+    setLoading(prev => ({ ...prev, cropHistory: true }))
+    try {
+      const cropHistoryData = await cropHistoryService.getAll()
+      setCropHistory(cropHistoryData || [])
+    } catch (error) {
+      console.error('Error loading crop history:', error)
+      setError('Failed to load crop history')
+    } finally {
+      setLoading(prev => ({ ...prev, cropHistory: false }))
+    }
+  }
+
+  // Remove the static data and replace with dynamic loading
+  const initializeCropHistory = () => {
+    return [
+      {
+        id: 1,
+        farmId: 1,
       farmName: 'North Field Farm',
       cropName: 'Tomatoes',
       variety: 'Roma',
@@ -122,10 +149,10 @@ const CropHistory = () => {
       pestIssues: 'Slugs in wet areas',
       fertilizerUsed: 'Organic fish emulsion',
       irrigationMethod: 'Drip irrigation',
-      soilCondition: 'Excellent',
-      weatherConditions: 'Cool fall weather, perfect for lettuce'
+weatherConditions: 'Cool fall weather, perfect for lettuce'
     }
-  ])
+  ];
+  }
 
   const [filteredHistory, setFilteredHistory] = useState(cropHistory)
   const [searchTerm, setSearchTerm] = useState('')
@@ -238,7 +265,7 @@ const CropHistory = () => {
     }
   }
 
-  const handleAddCropHistory = (e) => {
+  const handleAddCropHistory = async (e) => {
     e.preventDefault()
 
     if (!newCropHistory.farmId || !newCropHistory.cropName || !newCropHistory.plantingDate) {
@@ -248,35 +275,35 @@ const CropHistory = () => {
 
     const farmName = farms.find(f => f.id === parseInt(newCropHistory.farmId))?.name || ''
 
-    if (editingCrop) {
-      setCropHistory(prev => prev.map(crop =>
-        crop.id === editingCrop.id
-          ? {
-              ...crop,
-              ...newCropHistory,
-              farmId: parseInt(newCropHistory.farmId),
-              farmName,
-              area: parseFloat(newCropHistory.area),
-              yieldAmount: parseFloat(newCropHistory.yieldAmount) || 0
-            }
-          : crop
-      ))
-      toast.success('Crop history updated successfully!')
-      setEditingCrop(null)
-    } else {
-      const newEntry = {
-        id: Date.now(),
-        ...newCropHistory,
-        farmId: parseInt(newCropHistory.farmId),
-        farmName,
-        area: parseFloat(newCropHistory.area),
-        yieldAmount: parseFloat(newCropHistory.yieldAmount) || 0
-      }
-      setCropHistory(prev => [...prev, newEntry])
-      toast.success('Crop history added successfully!')
+    const cropHistoryData = {
+      ...newCropHistory,
+      farmId: parseInt(newCropHistory.farmId),
+      farmName,
+      area: parseFloat(newCropHistory.area),
+      yieldAmount: parseFloat(newCropHistory.yieldAmount) || 0
     }
 
-    resetForm()
+    try {
+      if (editingCrop) {
+        const updatedCrop = await cropHistoryService.update(editingCrop.id, cropHistoryData)
+        if (updatedCrop) {
+          await loadCropHistory()
+          toast.success('Crop history updated successfully!')
+          setEditingCrop(null)
+        }
+      } else {
+        const createdCrop = await cropHistoryService.create(cropHistoryData)
+        if (createdCrop) {
+          await loadCropHistory()
+          toast.success('Crop history added successfully!')
+        }
+      }
+      resetForm()
+      setShowAddForm(false)
+    } catch (error) {
+      console.error('Error saving crop history:', error)
+      toast.error('Failed to save crop history')
+    }
   }
 
   const resetForm = () => {
@@ -302,25 +329,25 @@ const CropHistory = () => {
   }
 
   const handleEditCrop = (crop) => {
-    setEditingCrop(crop)
     setNewCropHistory({
       farmId: crop.farmId.toString(),
       cropName: crop.cropName,
-      variety: crop.variety,
+      variety: crop.variety || '',
       plantingDate: crop.plantingDate,
-      harvestDate: crop.harvestDate,
+      harvestDate: crop.harvestDate || '',
       area: crop.area.toString(),
       yieldAmount: crop.yieldAmount.toString(),
       yieldUnit: crop.yieldUnit,
-      season: crop.season,
+      season: crop.season || '',
       status: crop.status,
-      notes: crop.notes,
-      pestIssues: crop.pestIssues,
-      fertilizerUsed: crop.fertilizerUsed,
-      irrigationMethod: crop.irrigationMethod,
-      soilCondition: crop.soilCondition,
-      weatherConditions: crop.weatherConditions
+      notes: crop.notes || '',
+      pestIssues: crop.pestIssues || '',
+      fertilizerUsed: crop.fertilizerUsed || '',
+      irrigationMethod: crop.irrigationMethod || 'Drip irrigation',
+      soilCondition: crop.soilCondition || 'Good',
+      weatherConditions: crop.weatherConditions || ''
     })
+    setEditingCrop(crop)
     setShowAddForm(true)
   }
 
@@ -369,6 +396,59 @@ const CropHistory = () => {
       {/* Stats Summary */}
       <section className="container mx-auto px-4 sm:px-6 lg:px-8 py-6">
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+const handleDeleteCrop = async (cropId) => {
+    if (window.confirm('Are you sure you want to delete this crop history record? This action cannot be undone.')) {
+      try {
+        const deleted = await cropHistoryService.delete(cropId)
+        if (deleted) {
+          await loadCropHistory()
+          toast.success('Crop history deleted successfully!')
+        }
+      } catch (error) {
+        console.error('Error deleting crop history:', error)
+        toast.error('Failed to delete crop history')
+      }
+    }
+  }
+
+  const calculateStats = () => {
+    const totalArea = filteredHistory.reduce((sum, crop) => sum + crop.area, 0)
+    const totalYield = filteredHistory.reduce((sum, crop) => sum + crop.yieldAmount, 0)
+    const successfulHarvests = filteredHistory.filter(crop => crop.status === 'Harvested').length
+    const successRate = filteredHistory.length > 0 ? (successfulHarvests / filteredHistory.length * 100).toFixed(1) : 0
+
+    return { totalArea, totalYield, successfulHarvests, successRate }
+  }
+
+  const stats = calculateStats()
+  const currentFarm = farmId ? farms.find(f => f.id === parseInt(farmId)) : null
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-green-50 to-teal-50 dark:from-surface-900 dark:via-surface-800 dark:to-surface-900">
+      {/* Header */}
+      <header className="bg-white/80 dark:bg-surface-800/80 backdrop-blur-sm shadow-sm">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <Link
+                to={farmId ? "/farms" : "/"}
+                className="flex items-center gap-2 text-surface-600 hover:text-primary transition-colors duration-300"
+              >
+                <ApperIcon name="ArrowLeft" className="h-5 w-5" />
+                {farmId ? 'Back to Farms' : 'Back to Dashboard'}
+              </Link>
+            </div>
+            <h1 className="text-2xl font-bold text-surface-900 dark:text-surface-100">
+              {currentFarm ? `${currentFarm.name} - Crop History` : 'Crop History'}
+            </h1>
+            <div className="w-32"></div>
+          </div>
+        </div>
+      </header>
+
+      {/* Stats Summary */}
+      <section className="container mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -376,7 +456,7 @@ const CropHistory = () => {
           >
             <div className="flex items-center gap-3 mb-2">
               <div className="p-2 rounded-xl bg-primary/10">
-                <ApperIcon name="Maximize" className="h-5 w-5 text-primary" />
+                <ApperIcon name="Map" className="h-5 w-5 text-primary" />
               </div>
               <span className="text-sm text-surface-600 dark:text-surface-400">Total Area</span>
             </div>

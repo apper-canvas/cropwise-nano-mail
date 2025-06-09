@@ -1,9 +1,13 @@
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { toast } from 'react-toastify'
 import ApperIcon from './ApperIcon'
+import expenseService from '../services/api/expenseService'
 
-const ExpenseReport = ({ expenses = [], onExport }) => {
+const ExpenseReport = ({ onExport }) => {
+  const [expenses, setExpenses] = useState([])
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState(null)
   const [filterPeriod, setFilterPeriod] = useState('all')
   const [filterCategory, setFilterCategory] = useState('all')
   const [searchTerm, setSearchTerm] = useState('')
@@ -14,6 +18,23 @@ const ExpenseReport = ({ expenses = [], onExport }) => {
   const [customDateRange, setCustomDateRange] = useState({ start: '', end: '' })
   const [showFilters, setShowFilters] = useState(false)
 
+  // Load expenses when component mounts
+  useEffect(() => {
+    loadExpenses()
+  }, [])
+
+  const loadExpenses = async () => {
+    setLoading(true)
+    try {
+      const expenseData = await expenseService.getAll()
+      setExpenses(expenseData || [])
+    } catch (error) {
+      console.error('Error loading expenses:', error)
+      setError('Failed to load expenses')
+    } finally {
+      setLoading(false)
+    }
+  }
   // Calculate date ranges
   const getDateRange = (period) => {
     const now = new Date()

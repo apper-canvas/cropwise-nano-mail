@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { toast } from 'react-toastify'
 import ApperIcon from './ApperIcon'
@@ -6,28 +6,25 @@ import CalendarView from './CalendarView'
 import DataExport from './DataExport'
 import KanbanView from './KanbanView'
 import ExpenseReport from './ExpenseReport'
+import farmService from '../services/api/farmService'
+import cropService from '../services/api/cropService'
+import taskService from '../services/api/taskService'
+import expenseService from '../services/api/expenseService'
 
 
 const MainFeature = () => {
   const [activeTab, setActiveTab] = useState('crops')
-  const [crops, setCrops] = useState([
-    { id: 1, name: 'Tomatoes', variety: 'Cherry', plantingDate: '2024-03-15', status: 'Growing', area: 2.5 },
-    { id: 2, name: 'Corn', variety: 'Sweet', plantingDate: '2024-04-01', status: 'Sprouting', area: 5.0 }
-  ])
-  const [tasks, setTasks] = useState([
-    { id: 1, title: 'Water Tomatoes', dueDate: '2024-12-20', priority: 'High', completed: false },
-    { id: 2, title: 'Fertilize Corn', dueDate: '2024-12-22', priority: 'Medium', completed: false }
-  ])
-  const [expenses, setExpenses] = useState([
-    { id: 1, description: 'Seeds - Tomato', amount: 45.99, category: 'Seeds', date: '2024-03-15' },
-    { id: 2, description: 'Fertilizer', amount: 89.50, category: 'Fertilizer', date: '2024-04-01' }
-  ])
-
-  const [farms, setFarms] = useState([
-    { id: 1, name: 'North Field Farm', location: 'North Valley, CA', size: 50.5, type: 'Vegetable', established: '2020-01-15', crops: ['Tomatoes', 'Corn'] },
-    { id: 2, name: 'Sunny Acres', location: 'Central Valley, CA', size: 75.2, type: 'Grain', established: '2018-05-20', crops: ['Wheat', 'Barley'] }
-  ])
-
+  const [crops, setCrops] = useState([])
+  const [tasks, setTasks] = useState([])
+  const [expenses, setExpenses] = useState([])
+  const [farms, setFarms] = useState([])
+  const [loading, setLoading] = useState({
+    farms: false,
+    crops: false,
+    tasks: false,
+    expenses: false
+  })
+  const [error, setError] = useState(null)
   const [showCropForm, setShowCropForm] = useState(false)
   const [showTaskForm, setShowTaskForm] = useState(false)
   const [showExpenseForm, setShowExpenseForm] = useState(false)
@@ -72,91 +69,152 @@ const MainFeature = () => {
     { id: 'tasks', label: 'Calendar', icon: 'Calendar' },
     { id: 'kanban', label: 'Kanban', icon: 'Columns' },
     { id: 'expenses', label: 'Expenses', icon: 'DollarSign' },
-    { id: 'expense-report', label: 'Reports', icon: 'BarChart3' }
-  ]
+]
 
-  const handleAddCrop = (e) => {
+  // Load all data on component mount
+  useEffect(() => {
+    loadFarms()
+    loadCrops()
+    loadTasks()
+    loadExpenses()
+  }, [])
+
+  const loadFarms = async () => {
+    setLoading(prev => ({ ...prev, farms: true }))
+    try {
+      const farmData = await farmService.getAll()
+      setFarms(farmData || [])
+    } catch (error) {
+      console.error('Error loading farms:', error)
+      setError('Failed to load farms')
+    } finally {
+      setLoading(prev => ({ ...prev, farms: false }))
+    }
+  }
+
+  const loadCrops = async () => {
+    setLoading(prev => ({ ...prev, crops: true }))
+    try {
+      const cropData = await cropService.getAll()
+      setCrops(cropData || [])
+    } catch (error) {
+      console.error('Error loading crops:', error)
+      setError('Failed to load crops')
+    } finally {
+      setLoading(prev => ({ ...prev, crops: false }))
+    }
+  }
+
+  const loadTasks = async () => {
+    setLoading(prev => ({ ...prev, tasks: true }))
+    try {
+      const taskData = await taskService.getAll()
+      setTasks(taskData || [])
+    } catch (error) {
+      console.error('Error loading tasks:', error)
+      setError('Failed to load tasks')
+    } finally {
+      setLoading(prev => ({ ...prev, tasks: false }))
+    }
+  }
+
+  const loadExpenses = async () => {
+    setLoading(prev => ({ ...prev, expenses: true }))
+    try {
+      const expenseData = await expenseService.getAll()
+      setExpenses(expenseData || [])
+    } catch (error) {
+      console.error('Error loading expenses:', error)
+      setError('Failed to load expenses')
+    } finally {
+      setLoading(prev => ({ ...prev, expenses: false }))
+    }
+  }
+
+  const handleAddCrop = async (e) => {
     e.preventDefault()
     if (!newCrop.name || !newCrop.variety || !newCrop.plantingDate || !newCrop.area || !newCrop.expectedHarvestDate || !newCrop.assignedFarm) {
       toast.error('Please fill in all fields')
       return
     }
 
-    const crop = {
-      id: Date.now(),
+    const cropData = {
       ...newCrop,
       status: 'Planning',
       area: parseFloat(newCrop.area)
     }
 
-    setCrops([...crops, crop])
-    setNewCrop({ name: '', variety: '', plantingDate: '', area: '', expectedHarvestDate: '', assignedFarm: '' })
-    setShowCropForm(false)
-    toast.success('Crop added successfully!')
+    const createdCrop = await cropService.create(cropData)
+    if (createdCrop) {
+      await loadCrops() // Refresh the list
+      setNewCrop({ name: '', variety: '', plantingDate: '', area: '', expectedHarvestDate: '', assignedFarm: '' })
+      setShowCropForm(false)
+    }
   }
 
-  const handleAddTask = (e) => {
+const handleAddTask = async (e) => {
     e.preventDefault()
     if (!newTask.title || !newTask.dueDate) {
       toast.error('Please fill in required fields')
       return
     }
 
-    const task = {
-      id: Date.now(),
+    const taskData = {
       ...newTask,
       completed: false
     }
 
-    setTasks([...tasks, task])
-    setNewTask({ title: '', dueDate: '', priority: 'Medium' })
-    setShowTaskForm(false)
-    toast.success('Task added successfully!')
+    const createdTask = await taskService.create(taskData)
+    if (createdTask) {
+      await loadTasks() // Refresh the list
+      setNewTask({ title: '', dueDate: '', priority: 'Medium' })
+      setShowTaskForm(false)
+    }
   }
 
-  const handleAddExpense = (e) => {
+  const handleAddExpense = async (e) => {
     e.preventDefault()
     if (!newExpense.description || !newExpense.amount || !newExpense.date) {
       toast.error('Please fill in all fields')
       return
     }
 
-    const expense = {
-      id: Date.now(),
+    const expenseData = {
       ...newExpense,
       amount: parseFloat(newExpense.amount)
     }
 
-    setExpenses([...expenses, expense])
-    setNewExpense({ description: '', amount: '', category: 'Seeds', date: '' })
-    setShowExpenseForm(false)
-    toast.success('Expense recorded successfully!')
+    const createdExpense = await expenseService.create(expenseData)
+    if (createdExpense) {
+      await loadExpenses() // Refresh the list
+      setNewExpense({ description: '', amount: '', category: 'Seeds', date: '' })
+      setShowExpenseForm(false)
+    }
   }
 
-  const handleAddFarm = (e) => {
+  const handleAddFarm = async (e) => {
     e.preventDefault()
     if (!newFarm.name || !newFarm.location || !newFarm.size || !newFarm.established) {
       toast.error('Please fill in all fields')
       return
     }
 
+    const farmData = {
+      ...newFarm,
+      size: parseFloat(newFarm.size)
+    }
+
     if (editingFarm) {
-      setFarms(farms.map(farm => 
-        farm.id === editingFarm.id 
-          ? { ...farm, ...newFarm, size: parseFloat(newFarm.size) }
-          : farm
-      ))
-      toast.success('Farm updated successfully!')
-      setEditingFarm(null)
-    } else {
-      const farm = {
-        id: Date.now(),
-        ...newFarm,
-        size: parseFloat(newFarm.size),
-        crops: []
+      const updatedFarm = await farmService.update(editingFarm.id, farmData)
+      if (updatedFarm) {
+        await loadFarms() // Refresh the list
+        setEditingFarm(null)
       }
-      setFarms([...farms, farm])
-      toast.success('Farm added successfully!')
+    } else {
+      const createdFarm = await farmService.create(farmData)
+      if (createdFarm) {
+        await loadFarms() // Refresh the list
+      }
     }
 
     setNewFarm({ name: '', location: '', size: '', type: 'Vegetable', established: '' })
@@ -175,10 +233,12 @@ const MainFeature = () => {
     setShowFarmForm(true)
   }
 
-  const handleDeleteFarm = (farmId) => {
+  const handleDeleteFarm = async (farmId) => {
     if (window.confirm('Are you sure you want to delete this farm?')) {
-      setFarms(farms.filter(farm => farm.id !== farmId))
-      toast.success('Farm deleted successfully!')
+      const deleted = await farmService.delete(farmId)
+      if (deleted) {
+        await loadFarms() // Refresh the list
+      }
     }
   }
 
@@ -188,13 +248,15 @@ const MainFeature = () => {
     setNewFarm({ name: '', location: '', size: '', type: 'Vegetable', established: '' })
   }
 
-  const toggleTask = (taskId) => {
-    setTasks(tasks.map(task => 
-      task.id === taskId 
-        ? { ...task, completed: !task.completed }
-        : task
-    ))
-    toast.success('Task updated!')
+  const toggleTask = async (taskId) => {
+    const task = tasks.find(t => t.id === taskId)
+    if (task) {
+      const updatedTaskData = { ...task, completed: !task.completed }
+      const updatedTask = await taskService.update(taskId, updatedTaskData)
+      if (updatedTask) {
+        await loadTasks() // Refresh the list
+      }
+    }
   }
 
   const getPriorityColor = (priority) => {
@@ -215,31 +277,27 @@ const MainFeature = () => {
     }
   }
 
-  const addWeatherTask = async () => {
-    // Mock weather-based task suggestions
-    const suggestions = [
-      { title: 'Check for frost protection', dueDate: new Date().toISOString().split('T')[0], priority: 'High' },
-      { title: 'Adjust watering schedule', dueDate: new Date().toISOString().split('T')[0], priority: 'Medium' }
-    ]
-    
+  const addWeatherTask = async (suggestions) => {
     if (suggestions.length > 0) {
-      const task = { ...suggestions[0], id: Date.now(), completed: false }
-      setTasks([...tasks, task])
-      toast.success('Weather-based task added!')
+      const taskData = { ...suggestions[0], completed: false }
+      const createdTask = await taskService.create(taskData)
+      if (createdTask) {
+        await loadTasks() // Refresh the list
+      }
     } else {
       toast.info('No weather-based tasks needed at this time')
     }
   }
-
-  return (
+return (
     <div className="bg-white/80 dark:bg-surface-800/80 backdrop-blur-sm rounded-2xl shadow-neu-light dark:shadow-neu-dark overflow-hidden">
       {/* Tab Navigation */}
+      <div className="border-b border-surface-200 dark:border-surface-700">
         <div className="flex overflow-x-auto scrollbar-hide">
           {tabs.map((tab) => (
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`flex items-center gap-2 px-4 sm:px-6 py-4 text-sm sm:text-base font-medium whitespace-nowrap transition-all duration-300 ${
+              className={`flex items-center gap-2 px-4 sm:px-6 py-3 sm:py-4 text-sm sm:text-base font-medium transition-colors duration-200 whitespace-nowrap ${
                 activeTab === tab.id
                   ? 'text-primary border-b-2 border-primary bg-primary/5'
                   : 'text-surface-600 dark:text-surface-400 hover:text-primary hover:bg-primary/5'
@@ -282,10 +340,7 @@ const MainFeature = () => {
                     <ApperIcon name="Plus" className="h-4 w-4" />
                     Add Farm
                   </button>
-                </div>
-              </div>
-
-              {/* Add/Edit Farm Form */}
+{/* Add Farm Form */}
               <AnimatePresence>
                 {showFarmForm && (
                   <motion.form
